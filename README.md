@@ -1,0 +1,3 @@
+# fp-ts iterators
+
+WIP

@@ -1,0 +1,566 @@
+import { Applicative1 } from "fp-ts/Applicative";
+import {
+  Apply1,
+  apFirst as apFirst_,
+  apS as apS_,
+  apSecond as apSecond_,
+} from "fp-ts/Apply";
+import * as chainable from "fp-ts/Chain";
+import { Either } from "fp-ts/Either";
+import { Eq } from "fp-ts/Eq";
+import {
+  PredicateWithIndex,
+  RefinementWithIndex,
+} from "fp-ts/FilterableWithIndex";
+import { FromIO1 } from "fp-ts/FromIO";
+import {
+  Functor1,
+  bindTo as bindTo_,
+  flap as flap_,
+  let as let_,
+} from "fp-ts/Functor";
+import { FunctorWithIndex1 } from "fp-ts/FunctorWithIndex";
+import { IO } from "fp-ts/IO";
+import { Monad1 } from "fp-ts/Monad";
+import { MonadIO1 } from "fp-ts/MonadIO";
+import { Monoid } from "fp-ts/Monoid";
+import { NaturalTransformation11 } from "fp-ts/NaturalTransformation";
+import * as O from "fp-ts/Option";
+import { Option } from "fp-ts/Option";
+import { Pointed1 } from "fp-ts/Pointed";
+import { Predicate } from "fp-ts/Predicate";
+import * as RA from "fp-ts/ReadonlyArray";
+import { Refinement } from "fp-ts/Refinement";
+import { Unfoldable1 } from "fp-ts/Unfoldable";
+import { identity, pipe } from "fp-ts/function";
+import {
+  asUnit as asUnit_,
+  as as as_,
+  dual,
+  tapIO as tapIO_,
+  tap as tap_,
+} from "./internal";
+
+/**
+ * @category type lambdas
+ */
+export const URI = "Iterable";
+
+/**
+ * @category type lambdas
+ */
+export type URI = typeof URI;
+
+declare module "fp-ts/HKT" {
+  export interface URItoKind<A> {
+    readonly [URI]: Iterable<A>;
+  }
+}
+
+/**
+ * Return a `Iterable` with elements initialized with `f(i)`.
+ * Iterable stops when f return O.none
+ *
+ * @category constructors
+ */
+export const makeByWithIndex = <A>(
+  f: (i: number) => Option<A>,
+): Iterable<A> => {
+  let i = 0;
+
+  return {
+    *[Symbol.iterator]() {
+      const el = f(i++);
+      if (O.isSome(el)) {
+        yield el.value;
+      }
+    },
+  };
+};
+
+/**
+ * @category constructors
+ */
+export const makeBy = <A>(f: () => Option<A>): Iterable<A> =>
+  makeByWithIndex(() => f());
+
+/**
+ * @category constructors
+ */
+export const unfold = <A, B>(
+  b: B,
+  f: (b: B) => Option<readonly [A, B]>,
+): Iterable<A> => {
+  let bb: B = b;
+
+  return {
+    *[Symbol.iterator]() {
+      const mt = f(bb);
+      if (O.isSome(mt)) {
+        const [a, b] = mt.value;
+        bb = b;
+        yield a;
+      }
+    },
+  };
+};
+
+/**
+ * @category conversions
+ */
+export const fromIO: <A>(fa: IO<A>) => Iterable<A> = (ma) => ({
+  *[Symbol.iterator]() {
+    yield ma();
+  },
+});
+
+/**
+ * @category conversions
+ * isn't it weird? all arrays are iterables
+ */
+export const fromReadonlyArray: NaturalTransformation11<RA.URI, URI> = (
+  ax,
+) => ({
+  *[Symbol.iterator]() {
+    for (const a of ax) {
+      yield a;
+    }
+  },
+});
+
+/**
+ * @category constructors
+ */
+export const of: Pointed1<URI>["of"] = (a) => ({
+  *[Symbol.iterator]() {
+    yield a;
+  },
+});
+
+/**
+ * @category instances
+ */
+export const Pointed: Pointed1<URI> = { URI, of };
+
+/**
+ * @category mapping
+ */
+export const mapWithIndex =
+  <A, B>(f: (index: number, a: A) => B) =>
+  (fa: Iterable<A>): Iterable<B> => {
+    let i = 0;
+    return {
+      *[Symbol.iterator]() {
+        for (const a of fa) {
+          yield f(i++, a);
+        }
+      },
+    };
+  };
+
+/**
+ * @category mapping
+ */
+export const map = <A, B>(f: (a: A) => B) => mapWithIndex((_i, a: A) => f(a));
+
+/**
+ * @category instances
+ */
+export const Functor: Functor1<URI> = {
+  URI,
+  map: (fa, f) => map(f)(fa),
+};
+
+/**
+ * @category instances
+ */
+export const FunctorWithIndex: FunctorWithIndex1<URI, number> = {
+  ...Functor,
+  mapWithIndex: (fa, f) => mapWithIndex(f)(fa),
+};
+
+/**
+ * Maps the value to the specified constant value.
+ *
+ * @category mapping
+ */
+export const as: {
+  <A>(a: A): <_>(self: Iterable<_>) => Iterable<A>;
+  <_, A>(self: Iterable<_>, a: A): Iterable<A>;
+} = dual(2, as_(Functor));
+
+/**
+ * Maps the value to the void constant value.
+ *
+ * @category mapping
+ */
+export const asUnit: <_>(self: Iterable<_>) => Iterable<void> =
+  asUnit_(Functor);
+
+/**
+ * @category mapping
+ */
+export const flap = flap_(Functor);
+
+/**
+ * @category apply
+ */
+export const ap =
+  <A>(fa: Iterable<A>) =>
+  <B>(fab: Iterable<(a: A) => B>): Iterable<B> => ({
+    *[Symbol.iterator]() {
+      for (const ab of fab) {
+        for (const a of fa) {
+          yield ab(a);
+        }
+      }
+    },
+  });
+
+/**
+ * @category instances
+ */
+export const Apply: Apply1<URI> = {
+  ...Functor,
+  ap: (fab, fa) => ap(fa)(fab),
+};
+
+/**
+ * @category apply
+ */
+export const apFirst = apFirst_(Apply);
+
+/**
+ * @category apply
+ */
+export const apSecond = apSecond_(Apply);
+
+/**
+ * @category instances
+ */
+export const Applicative: Applicative1<URI> = {
+  ...Pointed,
+  ...Apply,
+};
+
+/**
+ * @category sequencing
+ */
+export const flatMap =
+  <A, B>(f: (a: A) => Iterable<B>) =>
+  (fa: Iterable<A>): Iterable<B> => ({
+    *[Symbol.iterator]() {
+      for (const a1 of fa) {
+        for (const a2 of f(a1)) {
+          yield a2;
+        }
+      }
+    },
+  });
+
+/**
+ * @category sequencing
+ */
+export const flatten: <A>(mma: Iterable<Iterable<A>>) => Iterable<A> =
+  /*#__PURE__*/ flatMap(identity);
+
+/**
+ * @category instances
+ */
+export const Chain: chainable.Chain1<URI> = {
+  ...Apply,
+  chain: (fab, fa) => flatMap(fa)(fab),
+};
+
+/**
+ * @category instances
+ */
+export const Unfoldable: Unfoldable1<URI> = {
+  URI,
+  unfold,
+};
+
+/**
+ * @category instances
+ */
+export const Monad: Monad1<URI> = {
+  ...Pointed,
+  ...Chain,
+};
+
+/**
+ * @category instances
+ */
+export const FromIO: FromIO1<URI> = {
+  URI,
+  fromIO,
+};
+
+/**
+ * @category instances
+ */
+export const MonadIO: MonadIO1<URI> = {
+  ...Monad,
+  fromIO,
+};
+
+/**
+ * Same as [`filter`](#filter), but passing also the index to the iterating function.
+ *
+ * @category filtering
+ */
+export const filterWithIndex: {
+  <A, B extends A>(
+    refinementWithIndex: RefinementWithIndex<number, A, B>,
+  ): (fa: Iterable<A>) => Iterable<B>;
+  <A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): <B extends A>(fb: Iterable<A>) => Iterable<B>;
+  <A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): (fa: Iterable<A>) => Iterable<A>;
+} =
+  <A>(predicateWithIndex: PredicateWithIndex<number, A>) =>
+  (fa: Iterable<A>): Iterable<A> => {
+    let i = 0;
+
+    return {
+      *[Symbol.iterator]() {
+        for (const a of fa) {
+          if (predicateWithIndex(i++, a)) {
+            yield a;
+          }
+        }
+      },
+    };
+  };
+
+/**
+ * @category filtering
+ */
+export const filter: {
+  <A, B extends A>(
+    refinement: Refinement<A, B>,
+  ): (fa: Iterable<A>) => Iterable<B>;
+  <A>(predicate: Predicate<A>): <B extends A>(fb: Iterable<B>) => Iterable<B>;
+  <A>(predicate: Predicate<A>): (fa: Iterable<A>) => Iterable<A>;
+} =
+  <A>(predicate: Predicate<A>) =>
+  (fa: Iterable<A>) => ({
+    *[Symbol.iterator]() {
+      for (const a of fa) {
+        if (predicate(a)) {
+          yield a;
+        }
+      }
+    },
+  });
+
+/**
+ * @category filtering
+ */
+export const filterMapWithIndex =
+  <A, B>(f: (i: number, a: A) => Option<B>) =>
+  (fa: Iterable<A>): Iterable<B> => {
+    let i = 0;
+
+    return {
+      *[Symbol.iterator]() {
+        for (const a of fa) {
+          const optionB = f(i++, a);
+          if (O.isSome(optionB)) {
+            yield optionB.value;
+          }
+        }
+      },
+    };
+  };
+
+/**
+ * @category filtering
+ */
+export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
+  filterMapWithIndex<A, B>((_, a) => f(a));
+
+/**
+ * Compacts an Iterable of `Option`s discarding the `None` values and
+ * keeping the `Some` values. It returns a new array containing the values of
+ * the `Some` options.
+ * @category filtering
+ */
+export const compact: <A>(fa: Iterable<Option<A>>) => Iterable<A> =
+  /*#__PURE__*/ filterMap(identity);
+
+/**
+ * @category filtering
+ */
+export const rights = <E, A>(fa: Iterable<Either<E, A>>): Iterable<A> => ({
+  *[Symbol.iterator]() {
+    for (const a of fa) {
+      if (a._tag === "Right") {
+        yield a.right;
+      }
+    }
+  },
+});
+
+/**
+ * @category filtering
+ */
+export const lefts = <E, A>(ai: Iterable<Either<E, A>>): Iterable<E> => ({
+  *[Symbol.iterator]() {
+    for (const a of ai) {
+      if (a._tag === "Left") {
+        yield a.left;
+      }
+    }
+  },
+});
+
+/**
+ * Creates a new `Iterable` removing duplicate elements, keeping the first occurrence of an element,
+ * based on a `Eq<A>`.
+ */
+export const uniq =
+  <A>(E: Eq<A>) =>
+  (fa: Iterable<A>): Iterable<A> => {
+    const uniques: A[] = [];
+
+    return {
+      *[Symbol.iterator]() {
+        for (const a of fa) {
+          if (uniques.every((o) => !E.equals(o, a))) {
+            uniques.push(a);
+            yield a;
+          }
+        }
+      },
+    };
+  };
+
+/**
+ * @category mapping
+ */
+export function transform<A, B>(
+  transform: (a: A) => Option<B>,
+  flush?: () => B,
+) {
+  return (fa: Iterable<A>): Iterable<B> => ({
+    *[Symbol.iterator]() {
+      let isDone = true;
+      for (const a of fa) {
+        isDone = false;
+        const b = transform(a);
+        if (O.isSome(b)) {
+          yield b.value;
+        }
+      }
+
+      if (isDone && flush) {
+        yield flush();
+      }
+    },
+  });
+}
+
+/**
+ * Composes computations in sequence, using the return value of one computation to determine the next computation and
+ * keeping only the result of the first.
+ *
+ * @category combinators
+ */
+export const tap: {
+  <A, _>(self: Iterable<A>, f: (a: A) => Iterable<_>): Iterable<A>;
+  <A, _>(f: (a: A) => Iterable<_>): (self: Iterable<A>) => Iterable<A>;
+} = /*#__PURE__*/ dual(2, tap_(Chain));
+
+/**
+ * @category combinators
+ */
+export const tapIO: {
+  <A, _>(f: (a: A) => IO<_>): (self: Iterable<A>) => Iterable<A>;
+  <A, _>(self: Iterable<A>, f: (a: A) => IO<_>): Iterable<A>;
+} = /*#__PURE__*/ dual(2, tapIO_(FromIO, Chain));
+
+// -------------------------------------------------------------------------------------
+// do notation
+// -------------------------------------------------------------------------------------
+/**
+ * @category do notation
+ */
+export const Do: Iterable<{}> = /*#__PURE__*/ of({});
+
+/**
+ * @category do notation
+ */
+export const bind = chainable.bind(Chain);
+
+/**
+ * @category do notation
+ */
+export const bindTo = bindTo_(Functor);
+const _let = let_(Functor);
+export {
+  /**
+   * @category do notation
+   */
+  _let as let,
+};
+
+/**
+ * @category do notation
+ */
+export const apS = /*#__PURE__*/ apS_(Apply);
+
+/**
+ * @category folding
+ */
+export const reduceWithIndex: <A, B>(
+  b: B,
+  f: (i: number, b: B, a: A) => B,
+) => (fa: Iterable<A>) => B = (b, f) => (fa) => {
+  let i = 0;
+  let out = b;
+  for (const a of fa) {
+    out = f(i++, out, a);
+  }
+  return out;
+};
+
+/**
+ * @category folding
+ */
+export const reduce: <A, B>(
+  b: B,
+  f: (b: B, a: A) => B,
+) => (fa: Iterable<A>) => B = (b, f) =>
+  reduceWithIndex(b, (_, b, a) => f(b, a));
+
+/**
+ * @category folding
+ */
+export const foldMapWithIndex =
+  <M>(M: Monoid<M>) =>
+  <A>(f: (i: number, a: A) => M) =>
+  (fa: Iterable<A>): M =>
+    pipe(
+      fa,
+      reduceWithIndex(M.empty, (i, b, a) => M.concat(b, f(i, a))),
+    );
+
+/**
+ * @category folding
+ * @since 2.5.0
+ */
+export const foldMap: <M>(
+  M: Monoid<M>,
+) => <A>(f: (a: A) => M) => (fa: ReadonlyArray<A>) => M = (M) => {
+  const foldMapWithIndexM = foldMapWithIndex(M);
+  return (f) => foldMapWithIndexM((_, a) => f(a));
+};
+
+/**
+ * @category conversions
+ * @since 2.5.0
+ */
+export const toArray = <A>(fa: Iterable<A>): Array<A> => Array.from(fa);
