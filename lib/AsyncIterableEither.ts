@@ -42,6 +42,7 @@ import {
   tapTask as tapTask_,
   tap as tap_,
 } from "./internal";
+import { MonadTask2 } from "fp-ts/lib/MonadTask";
 
 /**
  * @category model
@@ -164,9 +165,9 @@ export const fromTask: <E, A>(fa: T.Task<A>) => AsyncIterableEither<E, A> =
  */
 export const fromTaskEither: <E, A>(
   fa: TE.TaskEither<E, A>,
-) => AsyncIterableEither<E, A> = (ma) => ({
+) => AsyncIterableEither<E, A> = (fa) => ({
   async *[Symbol.asyncIterator]() {
-    yield await ma();
+    yield await fa();
   },
 });
 
@@ -238,7 +239,7 @@ export function matchE<E, A, B>(
  *
  * @category pattern matching
  */
-/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchEW: <E, B, A, C>(
   onLeft: (e: E) => T.Task<B>,
   onRight: (a: A) => T.Task<C>,
@@ -267,7 +268,7 @@ export const getOrElseW: <E, B>(
   getOrElse as any;
 
 /**
- * @category error handling
+ * @category interop
  */
 export function tryCatch<E, A>(onRejected: (cause: unknown) => E) {
   return (fa: AsyncIterable<A>): AsyncIterableEither<E, A> => ({
@@ -536,14 +537,6 @@ export const Chain: chainable.Chain2<URI> = {
 /**
  * @category instances
  */
-export const Monad: Monad2<URI> = {
-  ...Pointed,
-  ...Chain,
-};
-
-/**
- * @category instances
- */
 export const FromIO: FromIO2<URI> = {
   URI,
   fromIO,
@@ -569,9 +562,25 @@ export const FromEither: FromEither2<URI> = {
 /**
  * @category instances
  */
+export const Monad: Monad2<URI> = {
+  ...Pointed,
+  ...Chain,
+};
+
+/**
+ * @category instances
+ */
 export const MonadIO: MonadIO2<URI> = {
   ...Monad,
   fromIO,
+};
+
+/**
+ * @category instances
+ */
+export const MonadTask: MonadTask2<URI> = {
+  ...MonadIO,
+  fromTask,
 };
 
 /**
