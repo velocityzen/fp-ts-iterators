@@ -1,3 +1,13 @@
+/**
+ * ```ts
+ * export interface AsyncIterableEither<E, A> extends AsyncIterable<Either<E, A>> {}
+ * ```
+ *
+ * `AsyncIterableEither<E, A>` represents an asynchronous stream that yields either of type `A` or yields an
+ * error of type `E`. If you want to represent an asynchronous stream that never fails, please see `AsyncIterable`.
+ *
+ * @since 1.0.0
+ */
 import { Applicative2 } from "fp-ts/Applicative";
 import {
   Apply2,
@@ -46,17 +56,20 @@ import { MonadTask2 } from "fp-ts/lib/MonadTask";
 
 /**
  * @category model
+ * @since 1.0.0
  */
 export interface AsyncIterableEither<E, A>
   extends AsyncIterable<Either<E, A>> {}
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export const URI = "AsyncIterableEither";
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export type URI = typeof URI;
 
@@ -72,18 +85,21 @@ declare module "fp-ts/HKT" {
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const left: <E = never, A = never>(e: E) => AsyncIterableEither<E, A> =
   /*#__PURE__*/ ET.left(AI.Pointed);
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const right: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
   /*#__PURE__*/ ET.right(AI.Pointed);
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const rightTask: <E = never, A = never>(
   ma: T.Task<A>,
@@ -95,6 +111,7 @@ export const rightTask: <E = never, A = never>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const leftTask: <E = never, A = never>(
   me: T.Task<E>,
@@ -106,12 +123,14 @@ export const leftTask: <E = never, A = never>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const of: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
   right;
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const rightAsyncIterable: <E = never, A = never>(
   ma: AsyncIterable<A>,
@@ -119,6 +138,7 @@ export const rightAsyncIterable: <E = never, A = never>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const leftAsyncIterable: <E = never, A = never>(
   me: AsyncIterable<E>,
@@ -126,6 +146,7 @@ export const leftAsyncIterable: <E = never, A = never>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const rightIO: <E = never, A = never>(
   ma: IO<A>,
@@ -136,6 +157,7 @@ export const rightIO: <E = never, A = never>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const leftIO: <E = never, A = never>(
   me: IO<E>,
@@ -150,18 +172,21 @@ export const leftIO: <E = never, A = never>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromIO: <A, E = never>(fa: IO<A>) => AsyncIterableEither<E, A> =
   rightIO;
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromTask: <E, A>(fa: T.Task<A>) => AsyncIterableEither<E, A> =
   rightTask;
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromTaskEither: <E, A>(
   fa: TE.TaskEither<E, A>,
@@ -173,6 +198,7 @@ export const fromTaskEither: <E, A>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromAsyncIterable: <A, E = never>(
   fa: AsyncIterable<A>,
@@ -180,12 +206,14 @@ export const fromAsyncIterable: <A, E = never>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromEither: <E, A>(fa: Either<E, A>) => AsyncIterableEither<E, A> =
   AI.of;
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromIOEither: <E, A>(
   fa: IOEither<E, A>,
@@ -193,6 +221,7 @@ export const fromIOEither: <E, A>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromAsyncIterableOption: <E>(
   onNone: LazyArg<E>,
@@ -201,6 +230,7 @@ export const fromAsyncIterableOption: <E>(
 
 /**
  * @category pattern matching
+ * @since 1.0.0
  */
 export const match: <E, B, A>(
   onLeft: (e: E) => B,
@@ -213,6 +243,7 @@ export const match: <E, B, A>(
  * The `W` suffix (short for **W**idening) means that the handler return types will be merged.
  *
  * @category pattern matching
+ * @since 1.0.0
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchW: <E, B, A, C>(
@@ -224,6 +255,7 @@ export const matchW: <E, B, A, C>(
  * The `E` suffix (short for **E**ffect) means that the handlers return an AsyncIterable.
  *
  * @category pattern matching
+ * @since 1.0.0
  */
 export function matchE<E, A, B>(
   onLeft: (e: E) => T.Task<B>,
@@ -238,6 +270,7 @@ export function matchE<E, A, B>(
  * The `W` suffix (short for **W**idening) means that the handler return types will be merged.
  *
  * @category pattern matching
+ * @since 1.0.0
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchEW: <E, B, A, C>(
@@ -247,6 +280,7 @@ export const matchEW: <E, B, A, C>(
 
 /**
  * @category error handling
+ * @since 1.0.0
  */
 export function getOrElse<E, A>(
   onLeft: (e: E) => A,
@@ -260,6 +294,7 @@ export function getOrElse<E, A>(
  * The `W` suffix (short for **W**idening) means that the handler return type will be merged.
  *
  * @category error handling
+ * @since 1.0.0
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const getOrElseW: <E, B>(
@@ -269,6 +304,7 @@ export const getOrElseW: <E, B>(
 
 /**
  * @category interop
+ * @since 1.0.0
  */
 export function tryCatch<E, A>(onRejected: (cause: unknown) => E) {
   return (fa: AsyncIterable<A>): AsyncIterableEither<E, A> => ({
@@ -286,6 +322,7 @@ export function tryCatch<E, A>(onRejected: (cause: unknown) => E) {
 
 /**
  * @category error handling
+ * @since 1.0.0
  * alias for tryCatch(E.toError)
  */
 export function tryCatchToError<A>() {
@@ -294,6 +331,7 @@ export function tryCatchToError<A>() {
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const toUnion: <E, A>(
   fa: AsyncIterableEither<E, A>,
@@ -301,6 +339,7 @@ export const toUnion: <E, A>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromNullable: <E>(
   e: E,
@@ -308,6 +347,7 @@ export const fromNullable: <E>(
   /*#__PURE__*/ ET.fromNullable(AI.Pointed);
 
 /**
+ * @since 1.0.0
  */
 export const swap: <E, A>(
   ma: AsyncIterableEither<E, A>,
@@ -318,6 +358,7 @@ export const swap: <E, A>(
  * use the type constructor `F` to represent some computational context.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const map: <A, B>(
   f: (a: A) => B,
@@ -328,6 +369,7 @@ export const map: <A, B>(
  * Returns a `AsyncIterableEither` whose failure and success channels have been mapped by the specified pair of functions, `f` and `g`.
  *
  * @category error handling
+ * @since 1.0.0
  */
 export const mapBoth: {
   <E, G, A, B>(
@@ -345,6 +387,7 @@ export const mapBoth: {
  * Returns a `AsyncIterableEither` with its error channel mapped using the specified function.
  *
  * @category error handling
+ * @since 1.0.0
  */
 export const mapError: {
   <E, G>(
@@ -358,6 +401,7 @@ export const mapError: {
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const ap: <E, A>(
   fa: AsyncIterableEither<E, A>,
@@ -370,6 +414,7 @@ export const ap: <E, A>(
  *
  * The `W` suffix (short for **W**idening) means that the error types will be merged.
  *
+ * @since 1.0.0
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const apW: <E2, A>(
@@ -380,6 +425,7 @@ export const apW: <E2, A>(
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMap: {
   <A, E2, B>(
@@ -393,6 +439,7 @@ export const flatMap: {
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapEither =
   <E1, E2, A, B>(f: (a: A) => E.Either<E2, B>) =>
@@ -406,6 +453,7 @@ export const flatMapEither =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapOption =
   <E, A, B>(f: (a: A) => O.Option<B>, onNone: LazyArg<E>) =>
@@ -419,6 +467,7 @@ export const flatMapOption =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapTask =
   <E, A, B>(f: (a: A) => T.Task<B>) =>
@@ -432,6 +481,7 @@ export const flatMapTask =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapTaskEither =
   <E1, E2, A, B>(f: (a: A) => TE.TaskEither<E2, B>) =>
@@ -445,6 +495,7 @@ export const flatMapTaskEither =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapTaskOption =
   <E, A, B>(f: (a: A) => TO.TaskOption<B>, onNone: LazyArg<E>) =>
@@ -463,11 +514,13 @@ export const flatMapTaskOption =
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Pointed: Pointed2<URI> = { URI, of };
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Functor: Functor2<URI> = {
   URI,
@@ -478,6 +531,7 @@ export const Functor: Functor2<URI> = {
  * Maps the value to the specified constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const as: {
   <A>(
@@ -490,6 +544,7 @@ export const as: {
  * Maps the value to the void constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const asUnit: <E, _>(
   self: AsyncIterableEither<E, _>,
@@ -497,11 +552,13 @@ export const asUnit: <E, _>(
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const flap = flap_(Functor);
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Apply: Apply2<URI> = {
   ...Functor,
@@ -510,16 +567,19 @@ export const Apply: Apply2<URI> = {
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apFirst = apFirst_(Apply);
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apSecond = apSecond_(Apply);
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Applicative: Applicative2<URI> = {
   ...Pointed,
@@ -528,6 +588,7 @@ export const Applicative: Applicative2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Chain: chainable.Chain2<URI> = {
   ...Apply,
@@ -536,6 +597,7 @@ export const Chain: chainable.Chain2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromIO: FromIO2<URI> = {
   URI,
@@ -544,6 +606,7 @@ export const FromIO: FromIO2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromTask: FromTask2<URI> = {
   URI,
@@ -553,6 +616,7 @@ export const FromTask: FromTask2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromEither: FromEither2<URI> = {
   URI,
@@ -561,6 +625,7 @@ export const FromEither: FromEither2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Monad: Monad2<URI> = {
   ...Pointed,
@@ -569,6 +634,7 @@ export const Monad: Monad2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const MonadIO: MonadIO2<URI> = {
   ...Monad,
@@ -577,6 +643,7 @@ export const MonadIO: MonadIO2<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const MonadTask: MonadTask2<URI> = {
   ...MonadIO,
@@ -588,6 +655,7 @@ export const MonadTask: MonadTask2<URI> = {
  * keeping only the result of the first.
  *
  * @category combinators
+ * @since 1.0.0
  */
 export const tap: {
   <E1, A, E2, _>(
@@ -601,6 +669,7 @@ export const tap: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapTask: {
   <A, _>(
@@ -614,6 +683,7 @@ export const tapTask: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapIO: {
   <A, _>(
@@ -627,6 +697,7 @@ export const tapIO: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapEither: {
   <A, E2, _>(
@@ -644,6 +715,7 @@ export const tapEither: {
  * The `W` suffix (short for **W**idening) means that the error types will be merged.
  *
  * @category sequencing
+ * @since 1.0.0
  */
 export const flattenW: <E1, E2, A>(
   mma: AsyncIterableEither<E1, AsyncIterableEither<E2, A>>,
@@ -651,6 +723,7 @@ export const flattenW: <E1, E2, A>(
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatten: <E, A>(
   mma: AsyncIterableEither<E, AsyncIterableEither<E, A>>,
@@ -661,34 +734,40 @@ export const flatten: <E, A>(
 // -------------------------------------------------------------------------------------
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const Do: AsyncIterableEither<never, {}> = /*#__PURE__*/ of({});
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bind = chainable.bind(Chain);
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bindTo = bindTo_(Functor);
 const _let = let_(Functor);
 export {
   /**
    * @category do notation
+   * @since 1.0.0
    */
   _let as let,
 };
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const apS = /*#__PURE__*/ apS_(Apply);
 
 /**
  * the order of the results does not corresponds to the order of async iterator elements
  * @category folding
+ * @since 1.0.0
  */
 export function toIterableLimited<E, A>(limit: number) {
   return flow(
@@ -715,6 +794,7 @@ export function toIterableLimited<E, A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toIterablePar<E, A>(limit: number) {
   return toIterableLimited<E, A>(limit);
@@ -722,6 +802,7 @@ export function toIterablePar<E, A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toIterableSeq<E, A>() {
   return toIterableLimited<E, A>(1);
@@ -730,6 +811,7 @@ export function toIterableSeq<E, A>() {
 /**
  * preserves the order of elements coming from async iterator and corresponding results
  * @category folding
+ * @since 1.0.0
  */
 export function toArrayLimited<E, A>(limit: number) {
   return reduceUntilWithIndexLimited<Either<E, A>, Either<E, Array<A>>>(
@@ -753,6 +835,7 @@ export function toArrayLimited<E, A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toArrayPar<E, A>(limit: number) {
   return toArrayLimited<E, A>(limit);
@@ -760,6 +843,7 @@ export function toArrayPar<E, A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toArraySeq<E, A>() {
   return toArrayLimited<E, A>(1);

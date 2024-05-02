@@ -1,3 +1,12 @@
+/**
+ * The Iterable module provides tools for working with Typescript's Iterable<T> type in a functional way.
+ *
+ * In functional jargon, this module provides a monadic interface over Typescript's Iterable<T>.
+ *
+ * This nodule does not implements fuctions that would lead to degrading perfomance of Iterable. Any Iterable can be easly converted to Array
+ *
+ * @since 1.0.0
+ */
 import { Applicative1 } from "fp-ts/Applicative";
 import {
   Apply1,
@@ -43,11 +52,13 @@ import {
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export const URI = "Iterable";
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export type URI = typeof URI;
 
@@ -62,6 +73,7 @@ declare module "fp-ts/HKT" {
  * Iterable stops when f return O.none
  *
  * @category constructors
+ * @since 1.0.0
  */
 export const makeByWithIndex = <A>(
   f: (i: number) => Option<A>,
@@ -80,12 +92,14 @@ export const makeByWithIndex = <A>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const makeBy = <A>(f: () => Option<A>): Iterable<A> =>
   makeByWithIndex(() => f());
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const unfold = <A, B>(
   b: B,
@@ -107,6 +121,7 @@ export const unfold = <A, B>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromIO: <A>(fa: IO<A>) => Iterable<A> = (ma) => ({
   *[Symbol.iterator]() {
@@ -116,6 +131,7 @@ export const fromIO: <A>(fa: IO<A>) => Iterable<A> = (ma) => ({
 
 /**
  * @category conversions
+ * @since 1.0.0
  * isn't it weird? all arrays are iterables
  */
 export const fromReadonlyArray: NaturalTransformation11<RA.URI, URI> = (
@@ -130,6 +146,7 @@ export const fromReadonlyArray: NaturalTransformation11<RA.URI, URI> = (
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const of: Pointed1<URI>["of"] = (a) => ({
   *[Symbol.iterator]() {
@@ -139,11 +156,13 @@ export const of: Pointed1<URI>["of"] = (a) => ({
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Pointed: Pointed1<URI> = { URI, of };
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const mapWithIndex =
   <A, B>(f: (index: number, a: A) => B) =>
@@ -160,11 +179,13 @@ export const mapWithIndex =
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const map = <A, B>(f: (a: A) => B) => mapWithIndex((_i, a: A) => f(a));
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Functor: Functor1<URI> = {
   URI,
@@ -173,6 +194,7 @@ export const Functor: Functor1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FunctorWithIndex: FunctorWithIndex1<URI, number> = {
   ...Functor,
@@ -183,6 +205,7 @@ export const FunctorWithIndex: FunctorWithIndex1<URI, number> = {
  * Maps the value to the specified constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const as: {
   <A>(a: A): <_>(self: Iterable<_>) => Iterable<A>;
@@ -193,17 +216,20 @@ export const as: {
  * Maps the value to the void constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const asUnit: <_>(self: Iterable<_>) => Iterable<void> =
   asUnit_(Functor);
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const flap = flap_(Functor);
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const ap =
   <A>(fa: Iterable<A>) =>
@@ -219,6 +245,7 @@ export const ap =
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Apply: Apply1<URI> = {
   ...Functor,
@@ -227,16 +254,19 @@ export const Apply: Apply1<URI> = {
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apFirst = apFirst_(Apply);
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apSecond = apSecond_(Apply);
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Applicative: Applicative1<URI> = {
   ...Pointed,
@@ -245,6 +275,7 @@ export const Applicative: Applicative1<URI> = {
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMap =
   <A, B>(f: (a: A) => Iterable<B>) =>
@@ -260,12 +291,14 @@ export const flatMap =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatten: <A>(mma: Iterable<Iterable<A>>) => Iterable<A> =
   /*#__PURE__*/ flatMap(identity);
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Chain: chainable.Chain1<URI> = {
   ...Apply,
@@ -274,6 +307,7 @@ export const Chain: chainable.Chain1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Unfoldable: Unfoldable1<URI> = {
   URI,
@@ -282,6 +316,7 @@ export const Unfoldable: Unfoldable1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Monad: Monad1<URI> = {
   ...Pointed,
@@ -290,6 +325,7 @@ export const Monad: Monad1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromIO: FromIO1<URI> = {
   URI,
@@ -298,6 +334,7 @@ export const FromIO: FromIO1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const MonadIO: MonadIO1<URI> = {
   ...Monad,
@@ -308,6 +345,7 @@ export const MonadIO: MonadIO1<URI> = {
  * Same as [`filter`](#filter), but passing also the index to the iterating function.
  *
  * @category filtering
+ * @since 1.0.0
  */
 export const filterWithIndex: {
   <A, B extends A>(
@@ -337,6 +375,7 @@ export const filterWithIndex: {
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filter: {
   <A, B extends A>(
@@ -358,6 +397,7 @@ export const filter: {
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMapWithIndex =
   <A, B>(f: (i: number, a: A) => Option<B>) =>
@@ -378,6 +418,7 @@ export const filterMapWithIndex =
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
   filterMapWithIndex<A, B>((_, a) => f(a));
@@ -387,12 +428,14 @@ export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
  * keeping the `Some` values. It returns a new array containing the values of
  * the `Some` options.
  * @category filtering
+ * @since 1.0.0
  */
 export const compact: <A>(fa: Iterable<Option<A>>) => Iterable<A> =
   /*#__PURE__*/ filterMap(identity);
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const rights = <E, A>(fa: Iterable<Either<E, A>>): Iterable<A> => ({
   *[Symbol.iterator]() {
@@ -406,6 +449,7 @@ export const rights = <E, A>(fa: Iterable<Either<E, A>>): Iterable<A> => ({
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const lefts = <E, A>(ai: Iterable<Either<E, A>>): Iterable<E> => ({
   *[Symbol.iterator]() {
@@ -420,11 +464,13 @@ export const lefts = <E, A>(ai: Iterable<Either<E, A>>): Iterable<E> => ({
 /**
  * Creates a new `Iterable` removing duplicate elements, keeping the first occurrence of an element,
  * based on a `Eq<A>`.
+
+ * @since 1.0.0
  */
 export const uniq =
   <A>(E: Eq<A>) =>
   (fa: Iterable<A>): Iterable<A> => {
-    const uniques: A[] = [];
+    const uniques: Array<A> = [];
 
     return {
       *[Symbol.iterator]() {
@@ -440,6 +486,7 @@ export const uniq =
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export function transform<A, B>(
   transform: (a: A) => Option<B>,
@@ -468,6 +515,7 @@ export function transform<A, B>(
  * keeping only the result of the first.
  *
  * @category combinators
+ * @since 1.0.0
  */
 export const tap: {
   <A, _>(self: Iterable<A>, f: (a: A) => Iterable<_>): Iterable<A>;
@@ -476,6 +524,7 @@ export const tap: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapIO: {
   <A, _>(f: (a: A) => IO<_>): (self: Iterable<A>) => Iterable<A>;
@@ -487,33 +536,39 @@ export const tapIO: {
 // -------------------------------------------------------------------------------------
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const Do: Iterable<{}> = /*#__PURE__*/ of({});
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bind = chainable.bind(Chain);
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bindTo = bindTo_(Functor);
 const _let = let_(Functor);
 export {
   /**
    * @category do notation
+   * @since 1.0.0
    */
   _let as let,
 };
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const apS = /*#__PURE__*/ apS_(Apply);
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const reduceWithIndex: <A, B>(
   b: B,
@@ -529,6 +584,7 @@ export const reduceWithIndex: <A, B>(
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const reduce: <A, B>(
   b: B,
@@ -538,6 +594,7 @@ export const reduce: <A, B>(
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const foldMapWithIndex =
   <M>(M: Monoid<M>) =>
@@ -550,7 +607,7 @@ export const foldMapWithIndex =
 
 /**
  * @category folding
- * @since 2.5.0
+ * @since 1.0.0
  */
 export const foldMap: <M>(
   M: Monoid<M>,
@@ -561,6 +618,6 @@ export const foldMap: <M>(
 
 /**
  * @category conversions
- * @since 2.5.0
+ * @since 1.0.0
  */
 export const toArray = <A>(fa: Iterable<A>): Array<A> => Array.from(fa);

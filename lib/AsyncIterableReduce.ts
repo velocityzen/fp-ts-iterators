@@ -1,3 +1,6 @@
+/**
+ * @since 1.0.0
+ */
 import * as O from "fp-ts/Option";
 import * as T from "fp-ts/Task";
 
@@ -17,12 +20,14 @@ function getIteratorNextTask<A>(
 
 /**
  * generic async iterable reducer.
- * limit: how many values pull in parallel.
- * until: predicate if the function should keep pulling values from the iterator
- * b: reducer accumulator initial value.
- * f: reducer function.
+ *
+ * - limit: how many values pull in parallel.
+ * - until: predicate if the function should keep pulling values from the iterator
+ * - b: reducer accumulator initial value.
+ * - f: reducer function.
  *
  * @category sequencing
+ * @since 1.0.0
  */
 export function reduceUntilWithIndexLimited<A, B>(
   limit: number,
@@ -55,7 +60,7 @@ export function reduceUntilWithIndexLimited<A, B>(
 
             reject(
               Error(
-                "This should never have happened. Use AsyncIterableEither tryCatch function to handle errors",
+                "This should never have happened. Use AsyncIterableEither or AsyncIterableOption tryCatch function to handle errors",
                 { cause },
               ),
             );

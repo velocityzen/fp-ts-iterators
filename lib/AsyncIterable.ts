@@ -1,3 +1,10 @@
+/**
+ * The AsyncIterable module provides tools for working with AsyncIterable<T> type in a functional way.
+ *
+ * In functional jargon, this module provides a monadic interface over AsyncIterable<T>.
+ *
+ * @since 1.0.0
+ */
 import { Applicative1 } from "fp-ts/Applicative";
 import {
   Apply1,
@@ -48,11 +55,13 @@ import {
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export const URI = "AsyncIterable";
 
 /**
  * @category type lambdas
+ * @since 1.0.0
  */
 export type URI = typeof URI;
 
@@ -64,9 +73,11 @@ declare module "fp-ts/HKT" {
 
 /**
  * Return a `AsyncIterable` with elements initialized with `f(i)`.
+ *
  * Iterable stops when f return O.none
  *
  * @category constructors
+ * @since 1.0.0
  */
 export const makeByWithIndex = <A>(
   f: (i: number) => Option<A>,
@@ -85,21 +96,25 @@ export const makeByWithIndex = <A>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const makeBy = <A>(f: () => Option<A>): AsyncIterable<A> =>
   makeByWithIndex(() => f());
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const makeByTask = <A>(f: () => Task<Option<A>>): AsyncIterable<A> =>
   makeByTaskWithIndex(() => f());
 
 /**
  * Return a `AsyncIterable` with elements initialized with `f(i)`.
+ *
  * Iterable stops when f return O.none
  *
  * @category constructors
+ * @since 1.0.0
  */
 export const makeByTaskWithIndex = <A>(
   f: (i: number) => Task<Option<A>>,
@@ -118,6 +133,7 @@ export const makeByTaskWithIndex = <A>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const unfold = <A, B>(
   b: B,
@@ -139,6 +155,7 @@ export const unfold = <A, B>(
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const unfoldTask = <A, B>(
   b: B,
@@ -160,6 +177,7 @@ export const unfoldTask = <A, B>(
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) => ({
   async *[Symbol.asyncIterator]() {
@@ -171,6 +189,7 @@ export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) => ({
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromIO: <A>(fa: IO<A>) => AsyncIterable<A> = (fa) => ({
   async *[Symbol.asyncIterator]() {
@@ -180,6 +199,7 @@ export const fromIO: <A>(fa: IO<A>) => AsyncIterable<A> = (fa) => ({
 
 /**
  * @category conversions
+ * @since 1.0.0
  */
 export const fromTask: <A>(fa: Task<A>) => AsyncIterable<A> = (fa) => ({
   async *[Symbol.asyncIterator]() {
@@ -189,6 +209,7 @@ export const fromTask: <A>(fa: Task<A>) => AsyncIterable<A> = (fa) => ({
 
 /**
  * @category constructors
+ * @since 1.0.0
  */
 export const of: Pointed1<URI>["of"] = (a) => ({
   async *[Symbol.asyncIterator]() {
@@ -198,11 +219,13 @@ export const of: Pointed1<URI>["of"] = (a) => ({
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Pointed: Pointed1<URI> = { URI, of };
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const mapWithIndex =
   <A, B>(f: (index: number, a: A) => B) =>
@@ -219,11 +242,13 @@ export const mapWithIndex =
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const map = <A, B>(f: (a: A) => B) => mapWithIndex((_i, a: A) => f(a));
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Functor: Functor1<URI> = {
   URI,
@@ -232,6 +257,7 @@ export const Functor: Functor1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FunctorWithIndex: FunctorWithIndex1<URI, number> = {
   ...Functor,
@@ -242,6 +268,7 @@ export const FunctorWithIndex: FunctorWithIndex1<URI, number> = {
  * Maps the value to the specified constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const as: {
   <A>(a: A): <_>(self: AsyncIterable<_>) => AsyncIterable<A>;
@@ -252,17 +279,20 @@ export const as: {
  * Maps the value to the void constant value.
  *
  * @category mapping
+ * @since 1.0.0
  */
 export const asUnit: <_>(self: AsyncIterable<_>) => AsyncIterable<void> =
   asUnit_(Functor);
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export const flap = flap_(Functor);
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const ap =
   <A>(fa: AsyncIterable<A>) =>
@@ -278,6 +308,7 @@ export const ap =
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apTask =
   <A>(fa: AsyncIterable<A>) =>
@@ -293,6 +324,7 @@ export const apTask =
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Apply: Apply1<URI> = {
   ...Functor,
@@ -301,16 +333,19 @@ export const Apply: Apply1<URI> = {
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apFirst = apFirst_(Apply);
 
 /**
  * @category apply
+ * @since 1.0.0
  */
 export const apSecond = apSecond_(Apply);
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Applicative: Applicative1<URI> = {
   ...Pointed,
@@ -319,6 +354,7 @@ export const Applicative: Applicative1<URI> = {
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMap =
   <A, B>(f: (a: A) => AsyncIterable<B>) =>
@@ -334,6 +370,7 @@ export const flatMap =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapIterable =
   <A, B>(f: (a: A) => Iterable<B>) =>
@@ -349,6 +386,7 @@ export const flatMapIterable =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapTaskWithIndex =
   <A, B>(f: (index: number, a: A) => Task<B>) =>
@@ -366,12 +404,14 @@ export const flatMapTaskWithIndex =
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatMapTask = <A, B>(f: (a: A) => Task<B>) =>
   flatMapTaskWithIndex((_i, a: A) => f(a));
 
 /**
  * @category sequencing
+ * @since 1.0.0
  */
 export const flatten: <A>(
   mma: AsyncIterable<AsyncIterable<A>>,
@@ -379,6 +419,7 @@ export const flatten: <A>(
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Chain: chainable.Chain1<URI> = {
   ...Apply,
@@ -387,6 +428,7 @@ export const Chain: chainable.Chain1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Unfoldable: Unfoldable1<URI> = {
   URI,
@@ -395,6 +437,7 @@ export const Unfoldable: Unfoldable1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const Monad: Monad1<URI> = {
   ...Pointed,
@@ -403,6 +446,7 @@ export const Monad: Monad1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromIO: FromIO1<URI> = {
   URI,
@@ -411,6 +455,7 @@ export const FromIO: FromIO1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const FromTask: FromTask1<URI> = {
   URI,
@@ -420,6 +465,7 @@ export const FromTask: FromTask1<URI> = {
 
 /**
  * @category instances
+ * @since 1.0.0
  */
 export const MonadIO: MonadIO1<URI> = {
   ...Monad,
@@ -430,6 +476,7 @@ export const MonadIO: MonadIO1<URI> = {
  * Same as [`filter`](#filter), but passing also the index to the iterating function.
  *
  * @category filtering
+ * @since 1.0.0
  */
 export const filterWithIndex: {
   <A, B extends A>(
@@ -459,6 +506,7 @@ export const filterWithIndex: {
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filter: {
   <A, B extends A>(
@@ -482,6 +530,7 @@ export const filter: {
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMapWithIndex =
   <A, B>(f: (i: number, a: A) => Option<B>) =>
@@ -502,12 +551,14 @@ export const filterMapWithIndex =
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
   filterMapWithIndex<A, B>((_, a) => f(a));
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMapTaskWithIndex =
   <A, B>(f: (i: number, a: A) => Task<Option<B>>) =>
@@ -528,6 +579,7 @@ export const filterMapTaskWithIndex =
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterMapTask = <A, B>(f: (a: A) => Task<Option<B>>) =>
   filterMapTaskWithIndex<A, B>((_, a) => f(a));
@@ -537,12 +589,14 @@ export const filterMapTask = <A, B>(f: (a: A) => Task<Option<B>>) =>
  * keeping the `Some` values. It returns a new array containing the values of
  * the `Some` options.
  * @category filtering
+ * @since 1.0.0
  */
 export const compact: <A>(fa: AsyncIterable<Option<A>>) => AsyncIterable<A> =
   /*#__PURE__*/ filterMap(identity);
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const rights = <E, A>(
   fa: AsyncIterable<Either<E, A>>,
@@ -558,6 +612,7 @@ export const rights = <E, A>(
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const lefts = <E, A>(
   ai: AsyncIterable<Either<E, A>>,
@@ -572,13 +627,14 @@ export const lefts = <E, A>(
 });
 
 /**
- * Creates a new `AsyncIterable` removing duplicate elements, keeping the first occurrence of an element,
- * based on a `Eq<A>`.
+ * Creates a new `AsyncIterable` removing duplicate elements, keeping the first occurrence of an element, based on a `Eq<A>`.
+ * @category filtering
+ * @since 1.0.0
  */
 export const uniq =
   <A>(E: Eq<A>) =>
   (fa: AsyncIterable<A>): AsyncIterable<A> => {
-    const uniques: A[] = [];
+    const uniques: Array<A> = [];
 
     return {
       async *[Symbol.asyncIterator]() {
@@ -594,6 +650,7 @@ export const uniq =
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export function transform<A, B>(
   transform: (a: A) => Option<B>,
@@ -619,6 +676,7 @@ export function transform<A, B>(
 
 /**
  * @category mapping
+ * @since 1.0.0
  */
 export function transformTask<A, B>(
   transform: (a: A) => Task<Option<B>>,
@@ -642,12 +700,17 @@ export function transformTask<A, B>(
   });
 }
 
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
 export interface PredicateTask<A> {
   (a: A): Task<boolean>;
 }
 
 /**
  * @category filtering
+ * @since 1.0.0
  */
 export const filterTask: {
   <A>(
@@ -671,6 +734,7 @@ export const filterTask: {
  * keeping only the result of the first.
  *
  * @category combinators
+ * @since 1.0.0
  */
 export const tap: {
   <A, _>(
@@ -684,6 +748,7 @@ export const tap: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapTask: {
   <A, _>(f: (a: A) => Task<_>): (self: AsyncIterable<A>) => AsyncIterable<A>;
@@ -692,6 +757,7 @@ export const tapTask: {
 
 /**
  * @category combinators
+ * @since 1.0.0
  */
 export const tapIO: {
   <A, _>(f: (a: A) => IO<_>): (self: AsyncIterable<A>) => AsyncIterable<A>;
@@ -703,34 +769,40 @@ export const tapIO: {
 // -------------------------------------------------------------------------------------
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const Do: AsyncIterable<{}> = /*#__PURE__*/ of({});
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bind = chainable.bind(Chain);
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const bindTo = bindTo_(Functor);
 const _let = let_(Functor);
 export {
   /**
    * @category do notation
+   * @since 1.0.0
    */
   _let as let,
 };
 
 /**
  * @category do notation
+ * @since 1.0.0
  */
 export const apS = /*#__PURE__*/ apS_(Apply);
 
 /**
  * the order of results does not corresponds to order of async iterator elements
  * @category folding
+ * @since 1.0.0
  */
 export function toIterableLimited<A>(limit: number) {
   return flow(
@@ -749,6 +821,7 @@ export function toIterableLimited<A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toIterablePar<A>(limit: number) {
   return toIterableLimited<A>(limit);
@@ -756,6 +829,7 @@ export function toIterablePar<A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toIterableSeq<A>() {
   return toIterableLimited<A>(1);
@@ -764,6 +838,7 @@ export function toIterableSeq<A>() {
 /**
  * preserves the order of elements coming from async iterator and corresponding results
  * @category folding
+ * @since 1.0.0
  */
 export function toArrayLimited<A>(limit: number) {
   return reduceUntilWithIndexLimited<A, Array<A>>(
@@ -779,6 +854,7 @@ export function toArrayLimited<A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toArrayPar<A>(limit: number) {
   return toArrayLimited<A>(limit);
@@ -786,6 +862,7 @@ export function toArrayPar<A>(limit: number) {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export function toArraySeq<A>() {
   return toArrayLimited<A>(1);
@@ -793,6 +870,7 @@ export function toArraySeq<A>() {
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const foldMapWithIndexPar =
   <M>(M: Monoid<M>, limit: number) =>
@@ -807,6 +885,7 @@ export const foldMapWithIndexPar =
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const foldMapPar: <M>(
   M: Monoid<M>,
@@ -818,6 +897,7 @@ export const foldMapPar: <M>(
 
 /**
  * @category folding
+ * @since 1.0.0
  */
 export const foldMapSeq: <M>(
   M: Monoid<M>,

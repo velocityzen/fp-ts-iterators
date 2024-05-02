@@ -1,25 +1,16 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "downlevelIteration": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "lib": ["esnext"],
-    "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
+    "esModuleInterop": true,
     "strict": true,
-    "target": "es2020",
-    "typeRoots": ["node_modules/@types", "./types"],
-    "declarationDir": "./build",
+    "downlevelIteration": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "stripInternal": true,
+    "skipLibCheck": true,
     "plugins": [
       {
         "name": "@unsplash/ts-namespace-import-plugin",
@@ -111,5 +102,6 @@
       "module": "commonjs"
     }
   },
-  "include": ["rollup.config.ts", "types/**/*", "lib/**/*", "tests/**/*"]
+  "include": ["./lib/**/*", "./test/**/*.ts"],
+  "exclude": ["./node_modules"]
 }
