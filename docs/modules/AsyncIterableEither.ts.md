@@ -47,6 +47,7 @@ Added in v1.0.0
   - [fromNullable](#fromnullable)
   - [fromTask](#fromtask)
   - [fromTaskEither](#fromtaskeither)
+  - [fromTaskOption](#fromtaskoption)
   - [toUnion](#tounion)
 - [do notation](#do-notation)
   - [Do](#do)
@@ -383,6 +384,16 @@ Added in v1.0.0
 
 ```ts
 export declare const fromTaskEither: <E, A>(fa: TE.TaskEither<E, A>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
+## fromTaskOption
+
+**Signature**
+
+```ts
+export declare const fromTaskOption: <E, A>(onNone: LazyArg<E>) => (fa: TO.TaskOption<A>) => AsyncIterableEither<E, A>
 ```
 
 Added in v1.0.0

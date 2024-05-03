@@ -36,6 +36,7 @@ Added in v1.0.0
 - [conversions](#conversions)
   - [fromIO](#fromio)
   - [fromIterable](#fromiterable)
+  - [fromLazyArg](#fromlazyarg)
   - [fromTask](#fromtask)
 - [do notation](#do-notation)
   - [Do](#do)
@@ -284,6 +285,16 @@ Added in v1.0.0
 
 ```ts
 export declare const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A>
+```
+
+Added in v1.0.0
+
+## fromLazyArg
+
+**Signature**
+
+```ts
+export declare const fromLazyArg: <A>(fa: LazyArg<A>) => AsyncIterable<A>
 ```
 
 Added in v1.0.0
