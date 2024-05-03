@@ -13,11 +13,22 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [sequencing](#sequencing)
+  - [getAsyncIteratorNextTask](#getasynciteratornexttask)
   - [reduceUntilWithIndexLimited](#reduceuntilwithindexlimited)
 
 ---
 
 # sequencing
+
+## getAsyncIteratorNextTask
+
+**Signature**
+
+```ts
+export declare function getAsyncIteratorNextTask<A>(iterable: AsyncIterable<A>): T.Task<O.Option<A>>
+```
+
+Added in v1.0.0
 
 ## reduceUntilWithIndexLimited
 

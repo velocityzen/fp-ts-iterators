@@ -59,7 +59,6 @@ Added in v1.0.0
   - [getOrElseW](#getorelsew)
   - [mapBoth](#mapboth)
   - [mapError](#maperror)
-  - [tryCatchToError](#trycatchtoerror)
 - [folding](#folding)
   - [toArrayLimited](#toarraylimited)
   - [toArrayPar](#toarraypar)
@@ -81,6 +80,7 @@ Added in v1.0.0
   - [Pointed](#pointed)
 - [interop](#interop)
   - [tryCatch](#trycatch)
+  - [tryCatchToError](#trycatchtoerror)
 - [mapping](#mapping)
   - [as](#as)
   - [asUnit](#asunit)
@@ -524,17 +524,6 @@ export declare const mapError: {
 
 Added in v1.0.0
 
-## tryCatchToError
-
-**Signature**
-
-```ts
-export declare function tryCatchToError<A>()
-```
-
-Added in v1.0.0
-alias for tryCatch(E.toError)
-
 # folding
 
 ## toArrayLimited
@@ -724,6 +713,17 @@ export declare function tryCatch<E, A>(onRejected: (cause: unknown) => E)
 ```
 
 Added in v1.0.0
+
+## tryCatchToError
+
+**Signature**
+
+```ts
+export declare function tryCatchToError<A>()
+```
+
+Added in v1.0.0
+alias for tryCatch(E.toError)
 
 # mapping
 

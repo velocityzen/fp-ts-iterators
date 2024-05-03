@@ -726,7 +726,7 @@ Added in v1.0.0
 
 ## as
 
-Maps the value to the specified constant value.
+Maps every value to the specified constant value.
 
 **Signature**
 
@@ -741,7 +741,7 @@ Added in v1.0.0
 
 ## asUnit
 
-Maps the value to the void constant value.
+Maps every value to the void constant value.
 
 **Signature**
 

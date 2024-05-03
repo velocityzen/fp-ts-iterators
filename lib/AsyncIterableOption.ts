@@ -97,20 +97,17 @@ export const of: <A>(a: A) => AsyncIterableOption<A> = some;
  * @category constructors
  * @since 1.0.0
  */
-export const someTask: <A>(a: Task<A>) => AsyncIterableOption<A> = (a) => ({
-  async *[Symbol.asyncIterator]() {
-    yield await pipe(a, T.map(O.some))();
-  },
-});
+export const someTask: <A>(a: Task<A>) => AsyncIterableOption<A> = (a) =>
+  AI.fromTask(pipe(a, T.map(O.some)));
 
 /**
  * @category lifting
  * @since 1.0.0
  */
 export const fromPredicate: {
-  <A, B extends A>(
-    refinement: Refinement<A, B>,
-  ): (a: A) => AsyncIterableOption<B>;
+  <A, B extends A>(refinement: Refinement<A, B>): (
+    a: A
+  ) => AsyncIterableOption<B>;
   <A>(predicate: Predicate<A>): <B extends A>(b: B) => AsyncIterableOption<B>;
   <A>(predicate: Predicate<A>): (a: A) => AsyncIterableOption<A>;
 } = OT.fromPredicate(AI.Pointed);
@@ -136,11 +133,8 @@ export const fromEither: <A>(fa: Either<unknown, A>) => AsyncIterableOption<A> =
  * @category conversions
  * @since 1.0.0
  */
-export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) => ({
-  async *[Symbol.asyncIterator]() {
-    yield O.some(fa());
-  },
-});
+export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) =>
+  AI.fromLazyArg(() => pipe(fa(), O.some));
 
 /**
  * @category conversions
@@ -153,12 +147,9 @@ export const fromTask: <A>(fa: Task<A>) => AsyncIterableOption<A> = someTask;
  * @since 1.0.0
  */
 export const fromTaskEither: <A>(
-  fa: TaskEither<unknown, A>,
-) => AsyncIterableOption<A> = (fa) => ({
-  async *[Symbol.asyncIterator]() {
-    yield await pipe(fa, T.map(O.fromEither))();
-  },
-});
+  fa: TaskEither<unknown, A>
+) => AsyncIterableOption<A> = (fa) =>
+  AI.fromTask(pipe(fa, T.map(O.fromEither)));
 
 /**
  * @category pattern matching
@@ -166,7 +157,7 @@ export const fromTaskEither: <A>(
  */
 export const match: <B, A>(
   onNone: () => B,
-  onSome: (a: A) => B,
+  onSome: (a: A) => B
 ) => (ma: AsyncIterableOption<A>) => AsyncIterable<B> = OT.match(AI.Functor);
 
 /**
@@ -180,7 +171,7 @@ export const match: <B, A>(
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchW: <B, A, C>(
   onNone: () => B,
-  onSome: (a: A) => C,
+  onSome: (a: A) => C
 ) => (ma: AsyncIterableOption<A>) => AsyncIterable<B | C> = match as any;
 
 /**
@@ -191,7 +182,7 @@ export const matchW: <B, A, C>(
  */
 export function matchE<A, B>(
   onNone: () => T.Task<B>,
-  onSome: (a: A) => Task<B>,
+  onSome: (a: A) => Task<B>
 ) {
   return AI.flatMapTask<Option<A>, B>(O.match(onNone, onSome));
 }
@@ -207,7 +198,7 @@ export function matchE<A, B>(
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchEW: <B, C, A>(
   onNone: () => Task<B>,
-  onSome: (a: A) => Task<C>,
+  onSome: (a: A) => Task<C>
 ) => (fa: AsyncIterableOption<A>) => AsyncIterable<B | C> = matchE as any;
 
 /**
@@ -215,7 +206,7 @@ export const matchEW: <B, C, A>(
  * @since 1.0.0
  */
 export function getOrElse<A>(
-  onNone: LazyArg<A>,
+  onNone: LazyArg<A>
 ): (fa: AsyncIterableOption<A>) => AsyncIterable<A> {
   return AI.map(O.getOrElse(onNone));
 }
@@ -230,7 +221,7 @@ export function getOrElse<A>(
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const getOrElseW: <B>(
-  onNone: LazyArg<B>,
+  onNone: LazyArg<B>
 ) => <A>(ma: AsyncIterableOption<A>) => AsyncIterable<A | B> = getOrElse as any;
 
 /**
@@ -266,16 +257,16 @@ export function tryCatch<A>(fa: AsyncIterable<A>): AsyncIterableOption<A> {
  * @since 1.0.0
  */
 export const map: <A, B>(
-  f: (a: A) => B,
+  f: (a: A) => B
 ) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B> = OT.map(
-  AI.Functor,
+  AI.Functor
 );
 
 /**
  * @since 1.0.0
  */
 export const ap: <A>(
-  fa: AsyncIterableOption<A>,
+  fa: AsyncIterableOption<A>
 ) => <B>(fab: AsyncIterableOption<(a: A) => B>) => AsyncIterableOption<B> =
   OT.ap(AI.Apply);
 
@@ -284,12 +275,12 @@ export const ap: <A>(
  * @since 1.0.0
  */
 export const flatMap: {
-  <A, B>(
-    f: (a: A) => AsyncIterableOption<B>,
-  ): (ma: AsyncIterableOption<A>) => AsyncIterableOption<B>;
+  <A, B>(f: (a: A) => AsyncIterableOption<B>): (
+    ma: AsyncIterableOption<A>
+  ) => AsyncIterableOption<B>;
   <A, B>(
     ma: AsyncIterableOption<A>,
-    f: (a: A) => AsyncIterableOption<B>,
+    f: (a: A) => AsyncIterableOption<B>
   ): AsyncIterableOption<B>;
 } = dual(2, OT.chain(AI.Monad));
 
@@ -326,7 +317,7 @@ export const flatMapTaskOption =
  * @since 1.0.0
  */
 export const flatten: <A>(
-  mma: AsyncIterableOption<AsyncIterableOption<A>>,
+  mma: AsyncIterableOption<AsyncIterableOption<A>>
 ) => AsyncIterableOption<A> = flatMap(identity);
 
 /**
@@ -335,7 +326,7 @@ export const flatten: <A>(
  */
 export const compact: Compactable1<URI>["compact"] = compact_(
   AI.Functor,
-  O.Compactable,
+  O.Compactable
 );
 
 /**
@@ -343,15 +334,15 @@ export const compact: Compactable1<URI>["compact"] = compact_(
  * @since 1.0.0
  */
 export const filter: {
-  <A, B extends A>(
-    refinement: Refinement<A, B>,
-  ): (fb: AsyncIterableOption<A>) => AsyncIterableOption<B>;
-  <A>(
-    predicate: Predicate<A>,
-  ): <B extends A>(fb: AsyncIterableOption<B>) => AsyncIterableOption<B>;
-  <A>(
-    predicate: Predicate<A>,
-  ): (fa: AsyncIterableOption<A>) => AsyncIterableOption<A>;
+  <A, B extends A>(refinement: Refinement<A, B>): (
+    fb: AsyncIterableOption<A>
+  ) => AsyncIterableOption<B>;
+  <A>(predicate: Predicate<A>): <B extends A>(
+    fb: AsyncIterableOption<B>
+  ) => AsyncIterableOption<B>;
+  <A>(predicate: Predicate<A>): (
+    fa: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
 } = filter_(AI.Functor, O.Filterable);
 
 /**
@@ -359,10 +350,10 @@ export const filter: {
  * @since 1.0.0
  */
 export const filterMap: <A, B>(
-  f: (a: A) => Option<B>,
+  f: (a: A) => Option<B>
 ) => (fga: AsyncIterableOption<A>) => AsyncIterableOption<B> = filterMap_(
   AI.Functor,
-  O.Filterable,
+  O.Filterable
 );
 
 /**
@@ -398,7 +389,7 @@ export const as: {
  * @since 1.0.0
  */
 export const asUnit: <_>(
-  self: AsyncIterableOption<_>,
+  self: AsyncIterableOption<_>
 ) => AsyncIterableOption<void> = asUnit_(Functor);
 
 /**
@@ -511,11 +502,11 @@ export const MonadTask: MonadTask1<URI> = {
 export const tap: {
   <A, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => AsyncIterableOption<_>,
+    f: (a: A) => AsyncIterableOption<_>
   ): AsyncIterableOption<A>;
-  <A, _>(
-    f: (a: A) => AsyncIterableOption<_>,
-  ): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>;
+  <A, _>(f: (a: A) => AsyncIterableOption<_>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
 } = /*#__PURE__*/ dual(2, tap_(Chain));
 
 /**
@@ -523,12 +514,12 @@ export const tap: {
  * @since 1.0.0
  */
 export const tapTask: {
-  <A, _>(
-    f: (a: A) => Task<_>,
-  ): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>;
+  <A, _>(f: (a: A) => Task<_>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
   <A, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => Task<_>,
+    f: (a: A) => Task<_>
   ): AsyncIterableOption<A>;
 } = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
 
@@ -537,12 +528,12 @@ export const tapTask: {
  * @since 1.0.0
  */
 export const tapIO: {
-  <A, _>(
-    f: (a: A) => IO<_>,
-  ): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>;
+  <A, _>(f: (a: A) => IO<_>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
   <A, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => IO<_>,
+    f: (a: A) => IO<_>
   ): AsyncIterableOption<A>;
 } = /*#__PURE__*/ dual(2, tapIO_(FromIO, Chain));
 
@@ -551,12 +542,12 @@ export const tapIO: {
  * @since 1.0.0
  */
 export const tapEither: {
-  <A, E, _>(
-    f: (a: A) => Either<E, _>,
-  ): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>;
+  <A, E, _>(f: (a: A) => Either<E, _>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
   <A, E, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => Either<E, _>,
+    f: (a: A) => Either<E, _>
   ): AsyncIterableOption<A>;
 } = /*#__PURE__*/ dual(2, tapEither_(FromEither, Chain));
 
@@ -640,7 +631,7 @@ export function toArrayLimited<A>(limit: number) {
 
       b.push(a.value);
       return b;
-    },
+    }
   );
 }
 

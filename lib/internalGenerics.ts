@@ -11,18 +11,18 @@
 export const dual: {
   <
     DataLast extends (...args: Array<any>) => any,
-    DataFirst extends (...args: Array<any>) => any,
+    DataFirst extends (...args: Array<any>) => any
   >(
     // arity: Parameters<DataFirst>["length"],
     arity: number,
-    body: DataFirst,
+    body: DataFirst
   ): DataLast & DataFirst;
   <
     DataLast extends (...args: Array<any>) => any,
-    DataFirst extends (...args: Array<any>) => any,
+    DataFirst extends (...args: Array<any>) => any
   >(
     isDataFirst: (args: IArguments) => boolean,
-    body: DataFirst,
+    body: DataFirst
   ): DataLast & DataFirst;
 } = (arity: any, body: any) => {
   const isDataFirst: (args: IArguments) => boolean =

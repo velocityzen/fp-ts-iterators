@@ -15,9 +15,9 @@ describe("AsyncIterableEither", () => {
       AIE.toArraySeq(),
       T.map(
         expectRightEither((values) =>
-          expect(values).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
-        ),
-      ),
+          expect(values).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        )
+      )
     );
 
     await test();
@@ -28,7 +28,7 @@ describe("AsyncIterableEither", () => {
       createTestAsyncIterableWithError(),
       AIE.tryCatchToError(),
       AIE.toArraySeq(),
-      T.map(expectLeftEither((error) => expect(error.message).toBe("It's 5!"))),
+      T.map(expectLeftEither((error) => expect(error.message).toBe("It's 5!")))
     );
 
     await test();

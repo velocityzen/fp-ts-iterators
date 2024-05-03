@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "lib": ["esnext"],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
@@ -102,6 +103,6 @@
       "module": "commonjs"
     }
   },
-  "include": ["./lib/**/*", "./test/**/*.ts"],
+  "include": ["./lib/**/*"],
   "exclude": ["./node_modules"]
 }

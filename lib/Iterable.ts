@@ -76,7 +76,7 @@ declare module "fp-ts/HKT" {
  * @since 1.0.0
  */
 export const makeByWithIndex = <A>(
-  f: (i: number) => Option<A>,
+  f: (i: number) => Option<A>
 ): Iterable<A> => {
   let i = 0;
 
@@ -103,7 +103,7 @@ export const makeBy = <A>(f: () => Option<A>): Iterable<A> =>
  */
 export const unfold = <A, B>(
   b: B,
-  f: (b: B) => Option<readonly [A, B]>,
+  f: (b: B) => Option<readonly [A, B]>
 ): Iterable<A> => {
   let bb: B = b;
 
@@ -135,7 +135,7 @@ export const fromIO: <A>(fa: IO<A>) => Iterable<A> = (ma) => ({
  * isn't it weird? all arrays are iterables
  */
 export const fromReadonlyArray: NaturalTransformation11<RA.URI, URI> = (
-  ax,
+  ax
 ) => ({
   *[Symbol.iterator]() {
     for (const a of ax) {
@@ -348,15 +348,15 @@ export const MonadIO: MonadIO1<URI> = {
  * @since 1.0.0
  */
 export const filterWithIndex: {
-  <A, B extends A>(
-    refinementWithIndex: RefinementWithIndex<number, A, B>,
-  ): (fa: Iterable<A>) => Iterable<B>;
-  <A>(
-    predicateWithIndex: PredicateWithIndex<number, A>,
-  ): <B extends A>(fb: Iterable<A>) => Iterable<B>;
-  <A>(
-    predicateWithIndex: PredicateWithIndex<number, A>,
-  ): (fa: Iterable<A>) => Iterable<A>;
+  <A, B extends A>(refinementWithIndex: RefinementWithIndex<number, A, B>): (
+    fa: Iterable<A>
+  ) => Iterable<B>;
+  <A>(predicateWithIndex: PredicateWithIndex<number, A>): <B extends A>(
+    fb: Iterable<A>
+  ) => Iterable<B>;
+  <A>(predicateWithIndex: PredicateWithIndex<number, A>): (
+    fa: Iterable<A>
+  ) => Iterable<A>;
 } =
   <A>(predicateWithIndex: PredicateWithIndex<number, A>) =>
   (fa: Iterable<A>): Iterable<A> => {
@@ -378,9 +378,9 @@ export const filterWithIndex: {
  * @since 1.0.0
  */
 export const filter: {
-  <A, B extends A>(
-    refinement: Refinement<A, B>,
-  ): (fa: Iterable<A>) => Iterable<B>;
+  <A, B extends A>(refinement: Refinement<A, B>): (
+    fa: Iterable<A>
+  ) => Iterable<B>;
   <A>(predicate: Predicate<A>): <B extends A>(fb: Iterable<B>) => Iterable<B>;
   <A>(predicate: Predicate<A>): (fa: Iterable<A>) => Iterable<A>;
 } =
@@ -490,7 +490,7 @@ export const uniq =
  */
 export function transform<A, B>(
   transform: (a: A) => Option<B>,
-  flush?: () => B,
+  flush?: () => B
 ) {
   return (fa: Iterable<A>): Iterable<B> => ({
     *[Symbol.iterator]() {
@@ -572,7 +572,7 @@ export const apS = /*#__PURE__*/ apS_(Apply);
  */
 export const reduceWithIndex: <A, B>(
   b: B,
-  f: (i: number, b: B, a: A) => B,
+  f: (i: number, b: B, a: A) => B
 ) => (fa: Iterable<A>) => B = (b, f) => (fa) => {
   let i = 0;
   let out = b;
@@ -588,7 +588,7 @@ export const reduceWithIndex: <A, B>(
  */
 export const reduce: <A, B>(
   b: B,
-  f: (b: B, a: A) => B,
+  f: (b: B, a: A) => B
 ) => (fa: Iterable<A>) => B = (b, f) =>
   reduceWithIndex(b, (_, b, a) => f(b, a));
 
@@ -602,7 +602,7 @@ export const foldMapWithIndex =
   (fa: Iterable<A>): M =>
     pipe(
       fa,
-      reduceWithIndex(M.empty, (i, b, a) => M.concat(b, f(i, a))),
+      reduceWithIndex(M.empty, (i, b, a) => M.concat(b, f(i, a)))
     );
 
 /**
@@ -610,7 +610,7 @@ export const foldMapWithIndex =
  * @since 1.0.0
  */
 export const foldMap: <M>(
-  M: Monoid<M>,
+  M: Monoid<M>
 ) => <A>(f: (a: A) => M) => (fa: ReadonlyArray<A>) => M = (M) => {
   const foldMapWithIndexM = foldMapWithIndex(M);
   return (f) => foldMapWithIndexM((_, a) => f(a));

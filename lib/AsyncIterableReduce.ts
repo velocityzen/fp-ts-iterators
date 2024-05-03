@@ -4,8 +4,12 @@
 import * as O from "fp-ts/Option";
 import * as T from "fp-ts/Task";
 
-function getIteratorNextTask<A>(
-  iterable: AsyncIterable<A>,
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export function getAsyncIteratorNextTask<A>(
+  iterable: AsyncIterable<A>
 ): T.Task<O.Option<A>> {
   async function next(): Promise<O.Option<A>> {
     for await (const value of iterable) {
@@ -33,7 +37,7 @@ export function reduceUntilWithIndexLimited<A, B>(
   limit: number,
   until: (a: A) => boolean,
   b: B,
-  f: (i: number, b: B, a: A) => B,
+  f: (i: number, b: B, a: A) => B
 ): (iterable: AsyncIterable<A>) => T.Task<B> {
   return (iterable) => () =>
     new Promise((resolve, reject) => {
@@ -42,7 +46,7 @@ export function reduceUntilWithIndexLimited<A, B>(
       let index = 0;
       let isDone = false;
 
-      const next = getIteratorNextTask(iterable);
+      const next = getAsyncIteratorNextTask(iterable);
 
       function run() {
         if (
@@ -61,8 +65,8 @@ export function reduceUntilWithIndexLimited<A, B>(
             reject(
               Error(
                 "This should never have happened. Use AsyncIterableEither or AsyncIterableOption tryCatch function to handle errors",
-                { cause },
-              ),
+                { cause }
+              )
             );
           });
       }
