@@ -209,6 +209,18 @@ export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) => {
  * @category conversions
  * @since 1.0.0
  */
+export function fromAsyncGenerator<A, R, N>(fa: () => AsyncGenerator<A, R, N>) {
+  return {
+    async *[Symbol.asyncIterator]() {
+      yield* fa();
+    },
+  };
+}
+
+/**
+ * @category conversions
+ * @since 1.0.0
+ */
 export const fromLazyArg: <A>(fa: LazyArg<A>) => AsyncIterable<A> = (fa) => {
   const f = yieldOnce(fa);
   return {
@@ -374,8 +386,8 @@ export const apTask =
         }
 
         if (i === fabs.length || justStarted) {
-          i = 0;
           justStarted = false;
+          i = 0;
           for await (a of fa) {
             yield await fabs[i++](a)();
           }
@@ -598,15 +610,17 @@ export const filterWithIndex: {
   (fa: AsyncIterable<A>): AsyncIterable<A> => {
     let i = 0;
 
-    return {
-      async *[Symbol.asyncIterator]() {
-        for await (const a of fa) {
-          if (predicateWithIndex(i++, a)) {
-            yield a;
-          }
+    async function* next(): AsyncGenerator<A> {
+      for await (const a of fa) {
+        if (predicateWithIndex(i++, a)) {
+          yield a;
+        } else {
+          yield* next();
         }
-      },
-    };
+      }
+    }
+
+    return fromAsyncGenerator(next);
   };
 
 /**
@@ -621,17 +635,64 @@ export const filter: {
     fb: AsyncIterable<B>
   ) => AsyncIterable<B>;
   <A>(predicate: Predicate<A>): (fa: AsyncIterable<A>) => AsyncIterable<A>;
+} = <A>(predicate: Predicate<A>) => filterWithIndex<A>((_, a) => predicate(a));
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export interface PredicateTaskWithIndex<I, A> {
+  (i: I, a: A): Task<boolean>;
+}
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTaskWithIndex: {
+  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): <B extends A>(
+    fb: AsyncIterable<B>
+  ) => AsyncIterable<B>;
+  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): (
+    fa: AsyncIterable<A>
+  ) => AsyncIterable<A>;
 } =
-  <A>(predicate: Predicate<A>) =>
-  (fa: AsyncIterable<A>) => ({
-    async *[Symbol.asyncIterator]() {
+  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>) =>
+  (fa: AsyncIterable<A>) => {
+    let i = 0;
+
+    async function* next(): AsyncGenerator<A> {
       for await (const a of fa) {
-        if (predicate(a)) {
+        if (await predicateWithIndex(i++, a)()) {
           yield a;
+        } else {
+          yield* next();
         }
       }
-    },
-  });
+    }
+
+    return fromAsyncGenerator(next);
+  };
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export interface PredicateTask<A> {
+  (a: A): Task<boolean>;
+}
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTask: {
+  <A>(predicate: PredicateTask<A>): <B extends A>(
+    fb: AsyncIterable<B>
+  ) => AsyncIterable<B>;
+  <A>(predicate: PredicateTask<A>): (fa: AsyncIterable<A>) => AsyncIterable<A>;
+} = <A>(predicate: PredicateTask<A>) =>
+  filterTaskWithIndex<A>((_, a) => predicate(a));
 
 /**
  * @category filtering
@@ -642,16 +703,18 @@ export const filterMapWithIndex =
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let i = 0;
 
-    return {
-      async *[Symbol.asyncIterator]() {
-        for await (const a of fa) {
-          const optionB = f(i++, a);
-          if (O.isSome(optionB)) {
-            yield optionB.value;
-          }
+    async function* next(): AsyncGenerator<B> {
+      for await (const a of fa) {
+        const optionB = f(i++, a);
+        if (O.isSome(optionB)) {
+          yield optionB.value;
+        } else {
+          yield* next();
         }
-      },
-    };
+      }
+    }
+
+    return fromAsyncGenerator(next);
   };
 
 /**
@@ -670,16 +733,18 @@ export const filterMapTaskWithIndex =
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let i = 0;
 
-    return {
-      async *[Symbol.asyncIterator]() {
-        for await (const a of fa) {
-          const optionB = await f(i++, a)();
-          if (O.isSome(optionB)) {
-            yield optionB.value;
-          }
+    async function* next(): AsyncGenerator<B> {
+      for await (const a of fa) {
+        const optionB = await f(i++, a)();
+        if (O.isSome(optionB)) {
+          yield optionB.value;
+        } else {
+          yield* next();
         }
-      },
-    };
+      }
+    }
+
+    return fromAsyncGenerator(next);
   };
 
 /**
@@ -705,31 +770,39 @@ export const compact: <A>(fa: AsyncIterable<Option<A>>) => AsyncIterable<A> =
  */
 export const rights = <E, A>(
   fa: AsyncIterable<Either<E, A>>
-): AsyncIterable<A> => ({
-  async *[Symbol.asyncIterator]() {
+): AsyncIterable<A> => {
+  async function* next(): AsyncGenerator<A> {
     for await (const a of fa) {
       if (a._tag === "Right") {
         yield a.right;
+      } else {
+        yield* next();
       }
     }
-  },
-});
+  }
+
+  return fromAsyncGenerator(next);
+};
 
 /**
  * @category filtering
  * @since 1.0.0
  */
 export const lefts = <E, A>(
-  ai: AsyncIterable<Either<E, A>>
-): AsyncIterable<E> => ({
-  async *[Symbol.asyncIterator]() {
-    for await (const a of ai) {
+  fa: AsyncIterable<Either<E, A>>
+): AsyncIterable<E> => {
+  async function* next(): AsyncGenerator<E> {
+    for await (const a of fa) {
       if (a._tag === "Left") {
         yield a.left;
+      } else {
+        yield* next();
       }
     }
-  },
-});
+  }
+
+  return fromAsyncGenerator(next);
+};
 
 /**
  * Creates a new `AsyncIterable` removing duplicate elements, keeping the first occurrence of an element, based on a `Eq<A>`.
@@ -741,16 +814,18 @@ export const uniq =
   (fa: AsyncIterable<A>): AsyncIterable<A> => {
     const uniques: Array<A> = [];
 
-    return {
-      async *[Symbol.asyncIterator]() {
-        for await (const a of fa) {
-          if (uniques.every((o) => !E.equals(o, a))) {
-            uniques.push(a);
-            yield a;
-          }
+    async function* next(): AsyncGenerator<A> {
+      for await (const a of fa) {
+        if (uniques.every((o) => !E.equals(o, a))) {
+          uniques.push(a);
+          yield a;
+        } else {
+          yield* next();
         }
-      },
-    };
+      }
+    }
+
+    return fromAsyncGenerator(next);
   };
 
 /**
@@ -761,22 +836,27 @@ export function transform<A, B>(
   transform: (a: A) => Option<B>,
   flush?: () => B
 ) {
-  return (fa: AsyncIterable<A>): AsyncIterable<B> => ({
-    async *[Symbol.asyncIterator]() {
-      let isDone = true;
+  return (fa: AsyncIterable<A>): AsyncIterable<B> => {
+    let isFlushed = false;
+
+    async function* next(): AsyncGenerator<B> {
       for await (const a of fa) {
-        isDone = false;
         const b = transform(a);
         if (O.isSome(b)) {
           yield b.value;
+        } else {
+          yield* next();
         }
       }
 
-      if (isDone && flush) {
+      if (!isFlushed && flush) {
+        isFlushed = true;
         yield flush();
       }
-    },
-  });
+    }
+
+    return fromAsyncGenerator(next);
+  };
 }
 
 /**
@@ -787,52 +867,28 @@ export function transformTask<A, B>(
   transform: (a: A) => Task<Option<B>>,
   flush?: () => Task<B>
 ) {
-  return (fa: AsyncIterable<A>): AsyncIterable<B> => ({
-    async *[Symbol.asyncIterator]() {
-      let isDone = true;
+  return (fa: AsyncIterable<A>): AsyncIterable<B> => {
+    let isFlushed = false;
+
+    async function* next(): AsyncGenerator<B> {
       for await (const a of fa) {
-        isDone = false;
         const b = await transform(a)();
         if (O.isSome(b)) {
           yield b.value;
+        } else {
+          yield* next();
         }
       }
 
-      if (isDone && flush) {
+      if (!isFlushed && flush) {
+        isFlushed = true;
         yield await flush()();
       }
-    },
-  });
-}
+    }
 
-/**
- * @category filtering
- * @since 1.0.0
- */
-export interface PredicateTask<A> {
-  (a: A): Task<boolean>;
+    return fromAsyncGenerator(next);
+  };
 }
-
-/**
- * @category filtering
- * @since 1.0.0
- */
-export const filterTask: {
-  <A>(predicate: PredicateTask<A>): <B extends A>(
-    fb: AsyncIterable<B>
-  ) => AsyncIterable<B>;
-  <A>(predicate: PredicateTask<A>): (fa: AsyncIterable<A>) => AsyncIterable<A>;
-} =
-  <A>(predicate: PredicateTask<A>) =>
-  (fa: AsyncIterable<A>) => ({
-    async *[Symbol.asyncIterator]() {
-      for await (const a of fa) {
-        if (await predicate(a)()) {
-          yield a;
-        }
-      }
-    },
-  });
 
 /**
  * Composes computations in sequence, using the return value of one computation to determine the next computation and
