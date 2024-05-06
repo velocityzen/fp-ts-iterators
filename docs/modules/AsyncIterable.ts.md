@@ -34,6 +34,7 @@ Added in v1.0.0
   - [unfold](#unfold)
   - [unfoldTask](#unfoldtask)
 - [conversions](#conversions)
+  - [fromAsyncGenerator](#fromasyncgenerator)
   - [fromIO](#fromio)
   - [fromIterable](#fromiterable)
   - [fromLazyArg](#fromlazyarg)
@@ -46,6 +47,7 @@ Added in v1.0.0
   - [let](#let)
 - [filtering](#filtering)
   - [PredicateTask (interface)](#predicatetask-interface)
+  - [PredicateTaskWithIndex (interface)](#predicatetaskwithindex-interface)
   - [compact](#compact)
   - [filter](#filter)
   - [filterMap](#filtermap)
@@ -53,6 +55,7 @@ Added in v1.0.0
   - [filterMapTaskWithIndex](#filtermaptaskwithindex)
   - [filterMapWithIndex](#filtermapwithindex)
   - [filterTask](#filtertask)
+  - [filterTaskWithIndex](#filtertaskwithindex)
   - [filterWithIndex](#filterwithindex)
   - [lefts](#lefts)
   - [rights](#rights)
@@ -269,6 +272,16 @@ Added in v1.0.0
 
 # conversions
 
+## fromAsyncGenerator
+
+**Signature**
+
+```ts
+export declare function fromAsyncGenerator<A, R, N>(fa: () => AsyncGenerator<A, R, N>)
+```
+
+Added in v1.0.0
+
 ## fromIO
 
 **Signature**
@@ -384,6 +397,18 @@ export interface PredicateTask<A> {
 
 Added in v1.0.0
 
+## PredicateTaskWithIndex (interface)
+
+**Signature**
+
+```ts
+export interface PredicateTaskWithIndex<I, A> {
+  (i: I, a: A): Task<boolean>
+}
+```
+
+Added in v1.0.0
+
 ## compact
 
 Compacts an AsyncIterable of `Option`s discarding the `None` values and
@@ -471,6 +496,19 @@ export declare const filterTask: {
 
 Added in v1.0.0
 
+## filterTaskWithIndex
+
+**Signature**
+
+```ts
+export declare const filterTaskWithIndex: {
+  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): <B extends A>(fb: AsyncIterable<B>) => AsyncIterable<B>
+  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): (fa: AsyncIterable<A>) => AsyncIterable<A>
+}
+```
+
+Added in v1.0.0
+
 ## filterWithIndex
 
 Same as [`filter`](#filter), but passing also the index to the iterating function.
@@ -492,7 +530,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lefts: <E, A>(ai: AsyncIterable<Either<E, A>>) => AsyncIterable<E>
+export declare const lefts: <E, A>(fa: AsyncIterable<Either<E, A>>) => AsyncIterable<E>
 ```
 
 Added in v1.0.0
