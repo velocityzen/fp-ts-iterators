@@ -377,7 +377,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const foldMap: <M>(M: Monoid<M>) => <A>(f: (a: A) => M) => (fa: readonly A[]) => M
+export declare const foldMap: <M>(M: Monoid<M>) => <A>(f: (a: A) => M) => (fa: Iterable<A>) => M
 ```
 
 Added in v1.0.0
