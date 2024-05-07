@@ -1,6 +1,6 @@
 ---
 title: AsyncIterable.ts
-nav_order: 1
+nav_order: 2
 parent: Modules
 ---
 
@@ -277,7 +277,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function fromAsyncGenerator<A, R, N>(fa: () => AsyncGenerator<A, R, N>)
+export declare function fromAsyncGenerator<A, R, N>(fa: LazyArg<AsyncGenerator<A, R, N>>)
 ```
 
 Added in v1.0.0
