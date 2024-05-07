@@ -1,4 +1,3 @@
-import * as O from "fp-ts/Option";
 import { IO } from "fp-ts/IO";
 import {
   HKT,
@@ -55,19 +54,6 @@ import {
 import { Either } from "fp-ts/lib/Either";
 
 export * from "./internalGenerics";
-
-/** @internal */
-export function yieldOnce<A>(f: undefined | (() => A)): () => O.Option<A> {
-  return () => {
-    if (f) {
-      const res = f();
-      f = undefined;
-      return O.some(res);
-    }
-
-    return O.none;
-  };
-}
 
 /** @internal */
 export function as<F extends URIS4>(
