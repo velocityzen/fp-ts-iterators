@@ -55,6 +55,7 @@ import {
   reduceUntilWithIndexLimited,
 } from "./AsyncIterableReduce";
 import * as I from "./Iterable";
+import * as AG from "./AsyncGenerator";
 import {
   asUnit as asUnit_,
   as as as_,
@@ -62,7 +63,6 @@ import {
   tapIO as tapIO_,
   tapTask as tapTask_,
   tap as tap_,
-  yieldOnce,
 } from "./internal";
 
 /**
@@ -191,25 +191,16 @@ export const unfoldTask = <A, B>(
  * @category conversions
  * @since 1.0.0
  */
-export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) => {
-  const as = Array.from(fa);
-  const length = as.length;
-  let i = 0;
-
-  return {
-    async *[Symbol.asyncIterator]() {
-      if (i < length) {
-        yield as[i++];
-      }
-    },
-  };
-};
+export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) =>
+  pipe(fa, AG.fromIterable, fromAsyncGenerator);
 
 /**
  * @category conversions
  * @since 1.0.0
  */
-export function fromAsyncGenerator<A, R, N>(fa: () => AsyncGenerator<A, R, N>) {
+export function fromAsyncGenerator<A, R, N>(
+  fa: LazyArg<AsyncGenerator<A, R, N>>
+) {
   return {
     async *[Symbol.asyncIterator]() {
       yield* fa();
@@ -221,17 +212,8 @@ export function fromAsyncGenerator<A, R, N>(fa: () => AsyncGenerator<A, R, N>) {
  * @category conversions
  * @since 1.0.0
  */
-export const fromLazyArg: <A>(fa: LazyArg<A>) => AsyncIterable<A> = (fa) => {
-  const f = yieldOnce(fa);
-  return {
-    async *[Symbol.asyncIterator]() {
-      const a = f();
-      if (O.isSome(a)) {
-        yield a.value;
-      }
-    },
-  };
-};
+export const fromLazyArg: <A>(fa: LazyArg<A>) => AsyncIterable<A> =
+  AG.fromLazyArg;
 
 /**
  * @category conversions
@@ -243,17 +225,7 @@ export const fromIO: <A>(fa: IO<A>) => AsyncIterable<A> = fromLazyArg;
  * @category conversions
  * @since 1.0.0
  */
-export const fromTask: <A>(fa: Task<A>) => AsyncIterable<A> = (fa) => {
-  const f = yieldOnce(fa);
-  return {
-    async *[Symbol.asyncIterator]() {
-      const a = f();
-      if (O.isSome(a)) {
-        yield await a.value;
-      }
-    },
-  };
-};
+export const fromTask: <A>(fa: Task<A>) => AsyncIterable<A> = AG.fromTask;
 
 /**
  * @category constructors
