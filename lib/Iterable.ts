@@ -75,20 +75,15 @@ declare module "fp-ts/HKT" {
  * @category constructors
  * @since 1.0.0
  */
-export const makeByWithIndex = <A>(
+export const makeByWithIndex: <A>(
   f: (i: number) => Option<A>
-): Iterable<A> => {
-  let i = 0;
-
-  return {
-    *[Symbol.iterator]() {
-      const el = f(i++);
-      if (O.isSome(el)) {
-        yield el.value;
-      }
-    },
-  };
-};
+) => Iterable<A> = (f) => ({
+  *[Symbol.iterator]() {
+    for (let i = 0, el = f(i); O.isSome(el); i++, el = f(i)) {
+      yield el.value;
+    }
+  },
+});
 
 /**
  * @category constructors
@@ -109,8 +104,7 @@ export const unfold = <A, B>(
 
   return {
     *[Symbol.iterator]() {
-      const mt = f(bb);
-      if (O.isSome(mt)) {
+      for (let mt = f(bb); O.isSome(mt); mt = f(bb)) {
         const [a, b] = mt.value;
         bb = b;
         yield a;
@@ -494,16 +488,14 @@ export function transform<A, B>(
 ) {
   return (fa: Iterable<A>): Iterable<B> => ({
     *[Symbol.iterator]() {
-      let isDone = true;
       for (const a of fa) {
-        isDone = false;
         const b = transform(a);
         if (O.isSome(b)) {
           yield b.value;
         }
       }
 
-      if (isDone && flush) {
+      if (flush) {
         yield flush();
       }
     },
@@ -611,7 +603,7 @@ export const foldMapWithIndex =
  */
 export const foldMap: <M>(
   M: Monoid<M>
-) => <A>(f: (a: A) => M) => (fa: ReadonlyArray<A>) => M = (M) => {
+) => <A>(f: (a: A) => M) => (fa: Iterable<A>) => M = (M) => {
   const foldMapWithIndexM = foldMapWithIndex(M);
   return (f) => foldMapWithIndexM((_, a) => f(a));
 };
