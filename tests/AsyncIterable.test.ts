@@ -1,9 +1,9 @@
 import * as T from "fp-ts/Task";
 import * as O from "fp-ts/Option";
 import * as E from "fp-ts/Either";
-import * as N from "fp-ts/Number";
-import * as B from "fp-ts/Boolean";
-import * as S from "fp-ts/String";
+import * as N from "fp-ts/number";
+import * as B from "fp-ts/boolean";
+import * as S from "fp-ts/string";
 // import * as C from "fp-ts/console";
 import { identity, pipe } from "fp-ts/function";
 import { Eq, contramap } from "fp-ts/Eq";
