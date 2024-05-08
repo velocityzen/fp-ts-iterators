@@ -39,6 +39,7 @@ import { IO } from "fp-ts/IO";
 import { IOEither } from "fp-ts/IOEither";
 import { Monad2 } from "fp-ts/Monad";
 import { MonadIO2 } from "fp-ts/MonadIO";
+import { MonadThrow2 } from "fp-ts/MonadThrow";
 import * as O from "fp-ts/Option";
 import { Pointed2 } from "fp-ts/Pointed";
 import { Predicate } from "fp-ts/Predicate";
@@ -553,6 +554,12 @@ export const flatMapTaskOption =
  * @since 1.0.0
  */
 export const Pointed: Pointed2<URI> = { URI, of };
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
+export const throwError: MonadThrow2<URI>["throwError"] = left;
 
 /**
  * @category instances
