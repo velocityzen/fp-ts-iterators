@@ -814,7 +814,7 @@ export const tapEither: {
  * Returns an effect that effectfully "peeks" at the failure of this effect.
  *
  * @category error handling
- * @since 2.15.0
+ * @since 1.0.0
  */
 export const tapError: {
   <E1, E2, _>(onLeft: (e: E1) => AsyncIterableEither<E2, _>): <A>(
