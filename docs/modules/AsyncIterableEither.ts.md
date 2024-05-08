@@ -32,11 +32,13 @@ Added in v1.0.0
   - [left](#left)
   - [leftAsyncIterable](#leftasynciterable)
   - [leftIO](#leftio)
+  - [leftIterable](#leftiterable)
   - [leftTask](#lefttask)
   - [of](#of)
   - [right](#right)
   - [rightAsyncIterable](#rightasynciterable)
   - [rightIO](#rightio)
+  - [rightIterable](#rightiterable)
   - [rightTask](#righttask)
 - [conversions](#conversions)
   - [fromAsyncIterable](#fromasynciterable)
@@ -44,7 +46,9 @@ Added in v1.0.0
   - [fromEither](#fromeither)
   - [fromIO](#fromio)
   - [fromIOEither](#fromioeither)
+  - [fromIterable](#fromiterable)
   - [fromNullable](#fromnullable)
+  - [fromOption](#fromoption)
   - [fromTask](#fromtask)
   - [fromTaskEither](#fromtaskeither)
   - [fromTaskOption](#fromtaskoption)
@@ -60,6 +64,9 @@ Added in v1.0.0
   - [getOrElseW](#getorelsew)
   - [mapBoth](#mapboth)
   - [mapError](#maperror)
+  - [tapError](#taperror)
+  - [tapErrorIO](#taperrorio)
+  - [tapErrorTask](#taperrortask)
 - [folding](#folding)
   - [toArrayLimited](#toarraylimited)
   - [toArrayPar](#toarraypar)
@@ -82,6 +89,12 @@ Added in v1.0.0
 - [interop](#interop)
   - [tryCatch](#trycatch)
   - [tryCatchToError](#trycatchtoerror)
+- [lifting](#lifting)
+  - [fromEitherK](#fromeitherk)
+  - [fromIOK](#fromiok)
+  - [fromOptionK](#fromoptionk)
+  - [fromPredicate](#frompredicate)
+  - [fromTaskK](#fromtaskk)
 - [mapping](#mapping)
   - [as](#as)
   - [asUnit](#asunit)
@@ -244,6 +257,16 @@ export declare const leftIO: <E = never, A = never>(me: IO<E>) => AsyncIterableE
 
 Added in v1.0.0
 
+## leftIterable
+
+**Signature**
+
+```ts
+export declare const leftIterable: <E = never, A = never>(ma: Iterable<E>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
 ## leftTask
 
 **Signature**
@@ -290,6 +313,16 @@ Added in v1.0.0
 
 ```ts
 export declare const rightIO: <E = never, A = never>(ma: IO<A>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
+## rightIterable
+
+**Signature**
+
+```ts
+export declare const rightIterable: <E = never, A = never>(ma: Iterable<A>) => AsyncIterableEither<E, A>
 ```
 
 Added in v1.0.0
@@ -358,12 +391,32 @@ export declare const fromIOEither: <E, A>(fa: IOEither<E, A>) => AsyncIterableEi
 
 Added in v1.0.0
 
+## fromIterable
+
+**Signature**
+
+```ts
+export declare const fromIterable: <A, E = never>(fa: Iterable<A>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
 ## fromNullable
 
 **Signature**
 
 ```ts
 export declare const fromNullable: <E>(e: E) => <A>(a: A) => AsyncIterableEither<E, NonNullable<A>>
+```
+
+Added in v1.0.0
+
+## fromOption
+
+**Signature**
+
+```ts
+export declare const fromOption: <E>(onNone: LazyArg<E>) => <A>(fa: O.Option<A>) => AsyncIterableEither<E, A>
 ```
 
 Added in v1.0.0
@@ -535,6 +588,50 @@ export declare const mapError: {
 
 Added in v1.0.0
 
+## tapError
+
+Returns an effect that effectfully "peeks" at the failure of this effect.
+
+**Signature**
+
+```ts
+export declare const tapError: {
+  <E1, E2, _>(onLeft: (e: E1) => AsyncIterableEither<E2, _>): <A>(
+    self: AsyncIterableEither<E1, A>
+  ) => AsyncIterableEither<E1 | E2, A>
+  <E1, A, E2, _>(self: AsyncIterableEither<E1, A>, onLeft: (e: E1) => AsyncIterableEither<E2, _>): AsyncIterableEither<
+    E1 | E2,
+    A
+  >
+}
+```
+
+Added in v2.15.0
+
+## tapErrorIO
+
+**Signature**
+
+```ts
+export declare const tapErrorIO: <E, B>(
+  onLeft: (e: E) => IO<B>
+) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
+## tapErrorTask
+
+**Signature**
+
+```ts
+export declare const tapErrorTask: <E, B>(
+  onLeft: (e: E) => T.Task<B>
+) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
 # folding
 
 ## toArrayLimited
@@ -675,6 +772,8 @@ Added in v1.0.0
 
 ## Monad
 
+/\*\*
+
 **Signature**
 
 ```ts
@@ -735,6 +834,70 @@ export declare function tryCatchToError<A>()
 
 Added in v1.0.0
 alias for tryCatch(E.toError)
+
+# lifting
+
+## fromEitherK
+
+**Signature**
+
+```ts
+export declare const fromEitherK: <E, A extends readonly unknown[], B>(
+  f: (...a: A) => E.Either<E, B>
+) => (...a: A) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## fromIOK
+
+**Signature**
+
+```ts
+export declare const fromIOK: <A extends readonly unknown[], B>(
+  f: (...a: A) => IO<B>
+) => <E = never>(...a: A) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## fromOptionK
+
+**Signature**
+
+```ts
+export declare const fromOptionK: <E>(
+  onNone: LazyArg<E>
+) => <A extends readonly unknown[], B>(f: (...a: A) => O.Option<B>) => (...a: A) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## fromPredicate
+
+**Signature**
+
+```ts
+export declare const fromPredicate: {
+  <E, A, B extends A>(refinement: Refinement<A, B>, onFalse: (a: A) => E): (a: A) => AsyncIterableEither<E, B>
+  <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): <B extends A>(b: B) => AsyncIterableEither<E, B>
+  <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): (a: A) => AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## fromTaskK
+
+**Signature**
+
+```ts
+export declare const fromTaskK: <A extends readonly unknown[], B>(
+  f: (...a: A) => T.Task<B>
+) => <E = never>(...a: A) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
 
 # mapping
 

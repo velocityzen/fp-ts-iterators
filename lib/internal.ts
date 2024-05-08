@@ -1,4 +1,44 @@
-import { IO } from "fp-ts/IO";
+import {
+  Chain,
+  Chain1,
+  Chain2,
+  Chain2C,
+  Chain3,
+  Chain3C,
+  Chain4,
+} from "fp-ts/Chain";
+import * as E from "fp-ts/Either";
+import * as ET from "fp-ts/EitherT";
+import { Either } from "fp-ts/Either";
+import {
+  FromEither,
+  FromEither1,
+  FromEither2,
+  FromEither2C,
+  FromEither3,
+  FromEither3C,
+  FromEither4,
+  fromEitherK,
+} from "fp-ts/FromEither";
+import {
+  FromIO,
+  FromIO1,
+  FromIO2,
+  FromIO2C,
+  FromIO3,
+  FromIO3C,
+  FromIO4,
+} from "fp-ts/FromIO";
+import {
+  FromTask,
+  FromTask1,
+  FromTask2,
+  FromTask2C,
+  FromTask3,
+  FromTask3C,
+  FromTask4,
+} from "fp-ts/FromTask";
+import { Functor, Functor1, Functor2, Functor3, Functor4 } from "fp-ts/Functor";
 import {
   HKT,
   HKT2,
@@ -11,47 +51,10 @@ import {
   URIS3,
   URIS4,
 } from "fp-ts/HKT";
-import { Functor, Functor1, Functor2, Functor3, Functor4 } from "fp-ts/Functor";
-import {
-  Chain,
-  Chain1,
-  Chain2,
-  Chain2C,
-  Chain3,
-  Chain3C,
-  Chain4,
-} from "fp-ts/Chain";
-import {
-  FromIO,
-  FromIO1,
-  FromIO2,
-  FromIO2C,
-  FromIO3,
-  FromIO3C,
-  FromIO4,
-} from "fp-ts/FromIO";
-import { flow } from "fp-ts/function";
-import {
-  FromTask,
-  FromTask1,
-  FromTask2,
-  FromTask2C,
-  FromTask3,
-  FromTask3C,
-  FromTask4,
-} from "fp-ts/FromTask";
+import { IO } from "fp-ts/IO";
+import { Monad, Monad1, Monad2 } from "fp-ts/Monad";
 import { Task } from "fp-ts/Task";
-import {
-  FromEither,
-  FromEither1,
-  FromEither2,
-  FromEither2C,
-  FromEither3,
-  FromEither3C,
-  FromEither4,
-  fromEitherK,
-} from "fp-ts/lib/FromEither";
-import { Either } from "fp-ts/lib/Either";
+import { flow, pipe } from "fp-ts/function";
 
 export * from "./internalGenerics";
 
@@ -303,4 +306,137 @@ export function tapEither<M extends URIS2>(
   const fromEither = fromEitherK(F);
   const tapM = tap(M);
   return (self, f) => tapM(self, fromEither(f));
+}
+
+/** @internal */
+export function mapBoth<F extends URIS2>(
+  F: Functor2<F>
+): <R, E, A, G, B>(
+  self: Kind2<F, R, Either<E, A>>,
+  f: (e: E) => G,
+  g: (a: A) => B
+) => Kind2<F, R, Either<G, B>>;
+/** @internal */
+export function mapBoth<F extends URIS>(
+  F: Functor1<F>
+): <E, A, G, B>(
+  self: Kind<F, Either<E, A>>,
+  f: (e: E) => G,
+  g: (a: A) => B
+) => Kind<F, Either<G, B>>;
+/** @internal */
+export function mapBoth<F>(
+  F: Functor<F>
+): <E, A, G, B>(
+  self: HKT<F, Either<E, A>>,
+  f: (e: E) => G,
+  g: (a: A) => B
+) => HKT<F, Either<G, B>>;
+/** @internal */
+export function mapBoth<F>(
+  F: Functor<F>
+): <E, A, G, B>(
+  self: HKT<F, Either<E, A>>,
+  f: (e: E) => G,
+  g: (a: A) => B
+) => HKT<F, Either<G, B>> {
+  return (self, f, g) => F.map(self, E.bimap(f, g));
+}
+
+/** @internal */
+export function mapError<F extends URIS2>(
+  F: Functor2<F>
+): <R, E, A, G>(
+  self: Kind2<F, R, Either<E, A>>,
+  f: (e: E) => G
+) => Kind2<F, R, Either<G, A>>;
+/** @internal */
+export function mapError<F extends URIS>(
+  F: Functor1<F>
+): <E, A, G>(
+  self: Kind<F, Either<E, A>>,
+  f: (e: E) => G
+) => Kind<F, Either<G, A>>;
+/** @internal */
+export function mapError<F>(
+  F: Functor<F>
+): <E, A, G>(
+  self: HKT<F, Either<E, A>>,
+  f: (e: E) => G
+) => HKT<F, Either<G, A>>;
+/** @internal */
+export function mapError<F>(
+  F: Functor<F>
+): <E, A, G>(
+  self: HKT<F, Either<E, A>>,
+  f: (e: E) => G
+) => HKT<F, Either<G, A>> {
+  return (self, f) => F.map(self, E.mapLeft(f));
+}
+
+/** @internal */
+export function flatMap<M extends URIS2>(
+  M: Monad2<M>
+): <ME, E, A, B>(
+  ma: Kind2<M, ME, Either<E, A>>,
+  f: (a: A) => Kind2<M, ME, Either<E, B>>
+) => Kind2<M, ME, Either<E, B>>;
+/** @internal */
+export function flatMap<M extends URIS>(
+  M: Monad1<M>
+): <E, A, B>(
+  ma: Kind<M, Either<E, A>>,
+  f: (a: A) => Kind<M, Either<E, B>>
+) => Kind<M, Either<E, B>>;
+/** @internal */
+export function flatMap<M>(
+  M: Monad<M>
+): <E, A, B>(
+  ma: HKT<M, Either<E, A>>,
+  f: (a: A) => HKT<M, Either<E, B>>
+) => HKT<M, Either<E, B>>;
+/** @internal */
+export function flatMap<M>(
+  M: Monad<M>
+): <E, A, B>(
+  ma: HKT<M, Either<E, A>>,
+  f: (a: A) => HKT<M, Either<E, B>>
+) => HKT<M, Either<E, B>> {
+  return (ma, f) => M.chain(ma, (e) => (E.isLeft(e) ? M.of(e) : f(e.right)));
+}
+
+/** @internal */
+export function tapError<M extends URIS2>(
+  M: Monad2<M>
+): <R, E, A, B>(
+  ma: Kind2<M, R, Either<E, A>>,
+  onLeft: (e: E) => Kind2<M, R, Either<E, B>>
+) => Kind2<M, R, Either<E, A>>;
+/** @internal */
+export function tapError<M extends URIS>(
+  M: Monad1<M>
+): <E, A, B>(
+  ma: Kind<M, Either<E, A>>,
+  onLeft: (e: E) => Kind<M, Either<E, B>>
+) => Kind<M, Either<E, A>>;
+/** @internal */
+export function tapError<M>(
+  M: Monad<M>
+): <E, A, B>(
+  ma: HKT<M, Either<E, A>>,
+  onLeft: (e: E) => HKT<M, Either<E, B>>
+) => HKT<M, Either<E, A>>;
+/** @internal */
+export function tapError<M>(
+  M: Monad<M>
+): <E, A, B>(
+  ma: HKT<M, Either<E, A>>,
+  onLeft: (e: E) => HKT<M, Either<E, B>>
+) => HKT<M, Either<E, A>> {
+  const orElseM = ET.orElse(M);
+  return (ma, onLeft) =>
+    pipe(
+      ma,
+      orElseM((e) => M.map(onLeft(e), (eb) => (E.isLeft(eb) ? eb : E.left(e))))
+    );
 }

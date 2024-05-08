@@ -1,4 +1,8 @@
 {
   "srcDir": "./lib",
-  "exclude": ["lib/internal.ts", "lib/internalGenerics.ts"]
+  "exclude": [
+    "lib/internal.ts",
+    "lib/internalGenerics.ts",
+    "lib/internalOption.ts"
+  ]
 }

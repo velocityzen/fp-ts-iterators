@@ -13,8 +13,8 @@ export const dual: {
     DataLast extends (...args: Array<any>) => any,
     DataFirst extends (...args: Array<any>) => any
   >(
-    // arity: Parameters<DataFirst>["length"],
-    arity: number,
+    arity: Parameters<DataFirst>["length"],
+    // arity: number,
     body: DataFirst
   ): DataLast & DataFirst;
   <

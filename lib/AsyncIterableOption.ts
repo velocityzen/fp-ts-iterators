@@ -56,7 +56,7 @@ import {
   tapTask as tapTask_,
   tap as tap_,
 } from "./internal";
-
+import { flatMap as flatMap_ } from "./internalOption";
 /**
  * @category model
  * @since 1.0.0
@@ -282,7 +282,7 @@ export const flatMap: {
     ma: AsyncIterableOption<A>,
     f: (a: A) => AsyncIterableOption<B>
   ): AsyncIterableOption<B>;
-} = dual(2, OT.chain(AI.Monad));
+} = dual(2, flatMap_(AI.Monad));
 
 /**
  * @category sequencing
