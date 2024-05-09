@@ -86,6 +86,7 @@ Added in v1.0.0
   - [MonadIO](#monadio)
   - [MonadTask](#monadtask)
   - [Pointed](#pointed)
+  - [throwError](#throwerror)
 - [interop](#interop)
   - [tryCatch](#trycatch)
   - [tryCatchToError](#trycatchtoerror)
@@ -606,7 +607,7 @@ export declare const tapError: {
 }
 ```
 
-Added in v2.15.0
+Added in v1.0.0
 
 ## tapErrorIO
 
@@ -808,6 +809,16 @@ Added in v1.0.0
 
 ```ts
 export declare const Pointed: Pointed2<'AsyncIterableEither'>
+```
+
+Added in v1.0.0
+
+## throwError
+
+**Signature**
+
+```ts
+export declare const throwError: <E, A>(e: E) => AsyncIterableEither<E, A>
 ```
 
 Added in v1.0.0

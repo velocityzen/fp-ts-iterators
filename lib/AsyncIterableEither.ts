@@ -57,15 +57,18 @@ import {
   asUnit as asUnit_,
   as as as_,
   dual,
+  tapIO as tapIO_,
+  tapTask as tapTask_,
+  tap as tap_,
+} from "./internal";
+
+import {
   flatMap as flatMap_,
   mapBoth as mapBoth_,
   mapError as mapError_,
   tapEither as tapEither_,
   tapError as tapError_,
-  tapIO as tapIO_,
-  tapTask as tapTask_,
-  tap as tap_,
-} from "./internal";
+} from "./internalEither";
 
 /**
  * @category model

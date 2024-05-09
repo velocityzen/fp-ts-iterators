@@ -51,12 +51,13 @@ import {
   asUnit as asUnit_,
   as as as_,
   dual,
-  tapEither as tapEither_,
   tapIO as tapIO_,
   tapTask as tapTask_,
   tap as tap_,
 } from "./internal";
+import { tapEither as tapEither_ } from "./internalEither";
 import { flatMap as flatMap_ } from "./internalOption";
+
 /**
  * @category model
  * @since 1.0.0
