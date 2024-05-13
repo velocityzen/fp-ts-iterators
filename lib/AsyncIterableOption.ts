@@ -58,6 +58,7 @@ import {
 } from "./internal";
 import { tapEither as tapEither_ } from "./internalEither";
 import { flatMap as flatMap_ } from "./internalOption";
+import { AsyncIterableEither } from "./AsyncIterableEither";
 
 /**
  * @category model
@@ -116,6 +117,14 @@ export const none: () => AsyncIterableOption<never> = /*#__PURE__*/ zero;
 export const someIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A> = (
   fa
 ) => AI.fromIterable(pipe(fa, I.map(O.some)));
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const someAsyncIterable: <A>(
+  fa: AsyncIterable<A>
+) => AsyncIterableOption<A> = AI.map(O.some);
 
 /**
  * @category constructors
@@ -194,6 +203,22 @@ export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) =>
  */
 export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A> =
   someIterable;
+
+/**
+ * @category conversions
+ * @since 1.0.0
+ */
+export const fromAsyncIterable: <A>(
+  fa: AsyncIterable<A>
+) => AsyncIterableOption<A> = someAsyncIterable;
+
+/**
+ * @category conversions
+ * @since 1.0.0
+ */
+export const fromAsyncIterableEither = <E, A>(
+  fa: AsyncIterableEither<E, A>
+): AsyncIterableOption<A> => pipe(fa, AI.map(O.fromEither));
 
 /**
  * @category conversions
@@ -331,6 +356,7 @@ export const map: <A, B>(
 
 /**
  * @since 1.0.0
+ * @category apply
  */
 export const ap: <A>(
   fa: AsyncIterableOption<A>
