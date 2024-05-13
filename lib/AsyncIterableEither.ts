@@ -213,6 +213,14 @@ export const fromTaskEither: <E, A>(
 ) => AsyncIterableEither<E, A> = AI.fromTask;
 
 /**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromTaskEitherK = <E, A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => TE.TaskEither<E, B>
+): ((...a: A) => AsyncIterableEither<E, B>) => flow(f, fromTaskEither);
+
+/**
  * @category conversions
  * @since 1.0.0
  */
@@ -798,6 +806,26 @@ export const tapTask: {
  * @category combinators
  * @since 1.0.0
  */
+export const tapTaskEither: {
+  <A, E2, _>(f: (a: A) => TE.TaskEither<E2, _>): <E1>(
+    self: AsyncIterableEither<E1, A>
+  ) => AsyncIterableEither<E1 | E2, A>;
+  <E1, A, E2, _>(
+    self: AsyncIterableEither<E1, A>,
+    f: (a: A) => TE.TaskEither<E2, _>
+  ): AsyncIterableEither<E1 | E2, A>;
+} = /*#__PURE__*/ dual(
+  2,
+  <E1, A, E2, _>(
+    self: AsyncIterableEither<E1, A>,
+    f: (a: A) => TE.TaskEither<E2, _>
+  ): AsyncIterableEither<E1 | E2, A> => tap(self, fromTaskEitherK(f))
+);
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
 export const tapIO: {
   <A, _>(f: (a: A) => IO<_>): <E>(
     self: AsyncIterableEither<E, A>
@@ -857,6 +885,16 @@ export const tapErrorTask: <E, B>(
 ) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A> = (
   onLeft
 ) => tapError(fromTaskK(onLeft));
+
+/**
+ * @category error handling
+ * @since 1.0.0
+ */
+export const tapErrorTaskEither: <E1, E2, B>(
+  onLeft: (e: E1) => TE.TaskEither<E2, B>
+) => <A>(ma: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A> = (
+  onLeft
+) => tapError(fromTaskEitherK(onLeft));
 
 /**
  * Less strict version of [`flatten`](#flatten).

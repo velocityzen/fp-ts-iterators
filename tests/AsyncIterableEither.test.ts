@@ -496,6 +496,27 @@ describe("AsyncIterableEither", () => {
     expect(ref).toStrictEqual([1]);
   });
 
+  test("tapTaskEither", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) =>
+      T.fromIO(() => (value < 2 ? E.left("left") : E.right(ref.push(value))));
+
+    await pipe(
+      AI.fromIterable([E.right(1), E.left("left"), E.right(3)]),
+      AIE.tapTaskEither(add),
+      AI.toArraySeq(),
+      T.map((value) =>
+        expect(value).toStrictEqual([
+          E.left("left"),
+          E.left("left"),
+          E.right(3),
+        ])
+      )
+    )();
+
+    expect(ref).toStrictEqual([3]);
+  });
+
   test("tapIO", async () => {
     const ref: Array<number> = [];
     const add = (value: number) => () => ref.push(value);
@@ -557,5 +578,29 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => expect(value).toStrictEqual([E.left("aa!")]))
     )();
+  });
+
+  test("tapErrorTaskEither", async () => {
+    const ref: Array<string> = [];
+    const add = (error: string) =>
+      T.fromIO(() =>
+        error === "2" ? E.left("left") : E.right(ref.push(error))
+      );
+
+    await pipe(
+      AI.fromIterable([E.right(1), E.left("2"), E.right(3), E.left("4")]),
+      AIE.tapErrorTaskEither(add),
+      AI.toArraySeq(),
+      T.map((value) =>
+        expect(value).toStrictEqual([
+          E.right(1),
+          E.left("left"),
+          E.right(3),
+          E.left("4"),
+        ])
+      )
+    )();
+
+    expect(ref).toStrictEqual(["4"]);
   });
 });
