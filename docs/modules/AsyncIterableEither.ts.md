@@ -29,6 +29,7 @@ Added in v1.0.0
   - [tapEither](#tapeither)
   - [tapIO](#tapio)
   - [tapTask](#taptask)
+  - [tapTaskEither](#taptaskeither)
 - [constructors](#constructors)
   - [left](#left)
   - [leftAsyncIterable](#leftasynciterable)
@@ -68,6 +69,7 @@ Added in v1.0.0
   - [tapError](#taperror)
   - [tapErrorIO](#taperrorio)
   - [tapErrorTask](#taperrortask)
+  - [tapErrorTaskEither](#taperrortaskeither)
 - [folding](#folding)
   - [toArrayLimited](#toarraylimited)
   - [toArrayPar](#toarraypar)
@@ -97,6 +99,7 @@ Added in v1.0.0
   - [fromIOK](#fromiok)
   - [fromOptionK](#fromoptionk)
   - [fromPredicate](#frompredicate)
+  - [fromTaskEitherK](#fromtaskeitherk)
   - [fromTaskK](#fromtaskk)
 - [mapping](#mapping)
   - [as](#as)
@@ -238,6 +241,21 @@ Added in v1.0.0
 export declare const tapTask: {
   <A, _>(f: (a: A) => T.Task<_>): <E>(self: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>
   <E, A, _>(self: AsyncIterableEither<E, A>, f: (a: A) => T.Task<_>): AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## tapTaskEither
+
+**Signature**
+
+```ts
+export declare const tapTaskEither: {
+  <A, E2, _>(f: (a: A) => TE.TaskEither<E2, _>): <E1>(
+    self: AsyncIterableEither<E1, A>
+  ) => AsyncIterableEither<E2 | E1, A>
+  <E1, A, E2, _>(self: AsyncIterableEither<E1, A>, f: (a: A) => TE.TaskEither<E2, _>): AsyncIterableEither<E1 | E2, A>
 }
 ```
 
@@ -650,6 +668,18 @@ export declare const tapErrorTask: <E, B>(
 
 Added in v1.0.0
 
+## tapErrorTaskEither
+
+**Signature**
+
+```ts
+export declare const tapErrorTaskEither: <E1, E2, B>(
+  onLeft: (e: E1) => TE.TaskEither<E2, B>
+) => <A>(ma: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A>
+```
+
+Added in v1.0.0
+
 # folding
 
 ## toArrayLimited
@@ -921,6 +951,18 @@ export declare const fromPredicate: {
   <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): <B extends A>(b: B) => AsyncIterableEither<E, B>
   <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): (a: A) => AsyncIterableEither<E, A>
 }
+```
+
+Added in v1.0.0
+
+## fromTaskEitherK
+
+**Signature**
+
+```ts
+export declare const fromTaskEitherK: <E, A extends readonly unknown[], B>(
+  f: (...a: A) => TE.TaskEither<E, B>
+) => (...a: A) => AsyncIterableEither<E, B>
 ```
 
 Added in v1.0.0
