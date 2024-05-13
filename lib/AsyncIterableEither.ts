@@ -450,6 +450,7 @@ export const ap: <E, A>(
  *
  * The `W` suffix (short for **W**idening) means that the error types will be merged.
  *
+ * @category apply
  * @since 1.0.0
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
