@@ -86,6 +86,7 @@ Added in v1.0.0
   - [Monad](#monad)
   - [MonadIO](#monadio)
   - [MonadTask](#monadtask)
+  - [MonadThrow](#monadthrow)
   - [Pointed](#pointed)
   - [throwError](#throwerror)
 - [interop](#interop)
@@ -815,6 +816,16 @@ Added in v1.0.0
 
 ```ts
 export declare const MonadTask: MonadTask2<'AsyncIterableEither'>
+```
+
+Added in v1.0.0
+
+## MonadThrow
+
+**Signature**
+
+```ts
+export declare const MonadThrow: MonadThrow2<'AsyncIterableEither'>
 ```
 
 Added in v1.0.0

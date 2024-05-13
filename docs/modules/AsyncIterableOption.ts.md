@@ -28,11 +28,14 @@ Added in v1.0.0
   - [tapEither](#tapeither)
   - [tapIO](#tapio)
   - [tapTask](#taptask)
+  - [tapTaskEither](#taptaskeither)
+  - [tapTaskOption](#taptaskoption)
 - [constructors](#constructors)
   - [none](#none)
   - [of](#of)
   - [some](#some)
   - [someAsyncIterable](#someasynciterable)
+  - [someIO](#someio)
   - [someIterable](#someiterable)
   - [someTask](#sometask)
   - [zero](#zero)
@@ -78,7 +81,9 @@ Added in v1.0.0
   - [Monad](#monad)
   - [MonadIO](#monadio)
   - [MonadTask](#monadtask)
+  - [MonadThrow](#monadthrow)
   - [Pointed](#pointed)
+  - [throwError](#throwerror)
 - [interop](#interop)
   - [tryCatch](#trycatch)
 - [lifting](#lifting)
@@ -86,7 +91,9 @@ Added in v1.0.0
   - [fromIOK](#fromiok)
   - [fromOptionK](#fromoptionk)
   - [fromPredicate](#frompredicate)
+  - [fromTaskEitherK](#fromtaskeitherk)
   - [fromTaskK](#fromtaskk)
+  - [fromTaskOptionK](#fromtaskoptionk)
 - [mapping](#mapping)
   - [as](#as)
   - [asUnit](#asunit)
@@ -208,6 +215,32 @@ export declare const tapTask: {
 
 Added in v1.0.0
 
+## tapTaskEither
+
+**Signature**
+
+```ts
+export declare const tapTaskEither: {
+  <A, _E, _B>(f: (a: A) => TE.TaskEither<_E, _B>): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>
+  <A, _E, _B>(self: AsyncIterableOption<A>, f: (a: A) => TE.TaskEither<_E, _B>): AsyncIterableOption<A>
+}
+```
+
+Added in v1.0.0
+
+## tapTaskOption
+
+**Signature**
+
+```ts
+export declare const tapTaskOption: {
+  <A, _>(f: (a: A) => TO.TaskOption<_>): (self: AsyncIterableOption<A>) => AsyncIterableOption<A>
+  <A, _>(self: AsyncIterableOption<A>, f: (a: A) => TO.TaskOption<_>): AsyncIterableOption<A>
+}
+```
+
+Added in v1.0.0
+
 # constructors
 
 ## none
@@ -246,6 +279,16 @@ Added in v1.0.0
 
 ```ts
 export declare const someAsyncIterable: <A>(fa: AsyncIterable<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
+## someIO
+
+**Signature**
+
+```ts
+export declare const someIO: <A>(fa: IO<A>) => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -367,7 +410,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fromTaskEither: <A>(fa: TE.TaskEither<unknown, A>) => AsyncIterableOption<A>
+export declare const fromTaskEither: <_, A>(fa: TE.TaskEither<_, A>) => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -680,12 +723,32 @@ export declare const MonadTask: MonadTask1<'AsyncIterableOption'>
 
 Added in v1.0.0
 
+## MonadThrow
+
+**Signature**
+
+```ts
+export declare const MonadThrow: MonadThrow1<'AsyncIterableOption'>
+```
+
+Added in v1.0.0
+
 ## Pointed
 
 **Signature**
 
 ```ts
 export declare const Pointed: Pointed1<'AsyncIterableOption'>
+```
+
+Added in v1.0.0
+
+## throwError
+
+**Signature**
+
+```ts
+export declare const throwError: <E, A>(e: E) => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -754,6 +817,18 @@ export declare const fromPredicate: {
 
 Added in v1.0.0
 
+## fromTaskEitherK
+
+**Signature**
+
+```ts
+export declare const fromTaskEitherK: <E, A extends readonly unknown[], B>(
+  f: (...a: A) => TE.TaskEither<E, B>
+) => (...a: A) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
 ## fromTaskK
 
 **Signature**
@@ -761,6 +836,18 @@ Added in v1.0.0
 ```ts
 export declare const fromTaskK: <A extends readonly unknown[], B>(
   f: (...a: A) => T.Task<B>
+) => (...a: A) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## fromTaskOptionK
+
+**Signature**
+
+```ts
+export declare const fromTaskOptionK: <A extends readonly unknown[], B>(
+  f: (...a: A) => TO.TaskOption<B>
 ) => (...a: A) => AsyncIterableOption<B>
 ```
 
