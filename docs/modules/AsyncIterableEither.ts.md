@@ -23,6 +23,7 @@ Added in v1.0.0
   - [ap](#ap)
   - [apFirst](#apfirst)
   - [apSecond](#apsecond)
+  - [apW](#apw)
 - [combinators](#combinators)
   - [tap](#tap)
   - [tapEither](#tapeither)
@@ -121,7 +122,6 @@ Added in v1.0.0
   - [URI](#uri)
   - [URI (type alias)](#uri-type-alias)
 - [utils](#utils)
-  - [apW](#apw)
   - [swap](#swap)
 
 ---
@@ -160,6 +160,22 @@ Added in v1.0.0
 export declare const apSecond: <E, B>(
   second: AsyncIterableEither<E, B>
 ) => <A>(first: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## apW
+
+Less strict version of [`ap`](#ap).
+
+The `W` suffix (short for **W**idening) means that the error types will be merged.
+
+**Signature**
+
+```ts
+export declare const apW: <E2, A>(
+  fa: AsyncIterableEither<E2, A>
+) => <E1, B>(fab: AsyncIterableEither<E1, (a: A) => B>) => AsyncIterableEither<E2 | E1, B>
 ```
 
 Added in v1.0.0
@@ -1168,22 +1184,6 @@ export type URI = typeof URI
 Added in v1.0.0
 
 # utils
-
-## apW
-
-Less strict version of [`ap`](#ap).
-
-The `W` suffix (short for **W**idening) means that the error types will be merged.
-
-**Signature**
-
-```ts
-export declare const apW: <E2, A>(
-  fa: AsyncIterableEither<E2, A>
-) => <E1, B>(fab: AsyncIterableEither<E1, (a: A) => B>) => AsyncIterableEither<E2 | E1, B>
-```
-
-Added in v1.0.0
 
 ## swap
 

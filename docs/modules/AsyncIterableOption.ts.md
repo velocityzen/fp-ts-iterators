@@ -20,6 +20,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [apply](#apply)
+  - [ap](#ap)
   - [apFirst](#apfirst)
   - [apSecond](#apsecond)
 - [combinators](#combinators)
@@ -31,10 +32,13 @@ Added in v1.0.0
   - [none](#none)
   - [of](#of)
   - [some](#some)
+  - [someAsyncIterable](#someasynciterable)
   - [someIterable](#someiterable)
   - [someTask](#sometask)
   - [zero](#zero)
 - [conversions](#conversions)
+  - [fromAsyncIterable](#fromasynciterable)
+  - [fromAsyncIterableEither](#fromasynciterableeither)
   - [fromEither](#fromeither)
   - [fromIO](#fromio)
   - [fromIterable](#fromiterable)
@@ -106,12 +110,22 @@ Added in v1.0.0
 - [type lambdas](#type-lambdas)
   - [URI](#uri)
   - [URI (type alias)](#uri-type-alias)
-- [utils](#utils)
-  - [ap](#ap)
 
 ---
 
 # apply
+
+## ap
+
+**Signature**
+
+```ts
+export declare const ap: <A>(
+  fa: AsyncIterableOption<A>
+) => <B>(fab: AsyncIterableOption<(a: A) => B>) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
 
 ## apFirst
 
@@ -226,6 +240,16 @@ export declare const some: <A>(a: A) => AsyncIterableOption<A>
 
 Added in v1.0.0
 
+## someAsyncIterable
+
+**Signature**
+
+```ts
+export declare const someAsyncIterable: <A>(fa: AsyncIterable<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
 ## someIterable
 
 **Signature**
@@ -257,6 +281,26 @@ export declare const zero: <A>() => AsyncIterableOption<A>
 Added in v1.0.0
 
 # conversions
+
+## fromAsyncIterable
+
+**Signature**
+
+```ts
+export declare const fromAsyncIterable: <A>(fa: AsyncIterable<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
+## fromAsyncIterableEither
+
+**Signature**
+
+```ts
+export declare const fromAsyncIterableEither: <E, A>(fa: AsyncIterableEither<E, A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
 
 ## fromEither
 
@@ -950,20 +994,6 @@ Added in v1.0.0
 
 ```ts
 export type URI = typeof URI
-```
-
-Added in v1.0.0
-
-# utils
-
-## ap
-
-**Signature**
-
-```ts
-export declare const ap: <A>(
-  fa: AsyncIterableOption<A>
-) => <B>(fab: AsyncIterableOption<(a: A) => B>) => AsyncIterableOption<B>
 ```
 
 Added in v1.0.0
