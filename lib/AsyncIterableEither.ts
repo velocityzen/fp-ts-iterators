@@ -559,12 +559,6 @@ export const Pointed: Pointed2<URI> = { URI, of };
  * @category instances
  * @since 1.0.0
  */
-export const throwError: MonadThrow2<URI>["throwError"] = left;
-
-/**
- * @category instances
- * @since 1.0.0
- */
 export const Functor: Functor2<URI> = {
   URI,
   map: (fa, f) => map(f)(fa),
@@ -734,6 +728,21 @@ export const fromPredicate: {
 export const Monad: Monad2<URI> = {
   ...Pointed,
   ...Chain,
+};
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
+export const throwError: MonadThrow2<URI>["throwError"] = left;
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
+export const MonadThrow: MonadThrow2<URI> = {
+  ...Monad,
+  throwError,
 };
 
 /**
