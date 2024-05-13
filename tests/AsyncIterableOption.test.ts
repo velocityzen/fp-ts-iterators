@@ -360,10 +360,7 @@ describe("AsyncIterableEither", () => {
       AI.fromIterable([O.some(1), O.none, O.some(3)]),
       AIO.tap((a) => (a > 1 ? AIO.some(a * 2) : AIO.none())),
       AI.toArraySeq(),
-      T.map((value) => {
-        console.log(value);
-        expect(value).toStrictEqual([O.none, O.none, O.some(3)]);
-      })
+      T.map((value) => expect(value).toStrictEqual([O.none, O.none, O.some(3)]))
     );
 
     return test();
@@ -401,5 +398,35 @@ describe("AsyncIterableEither", () => {
     )();
 
     expect(ref).toStrictEqual([1]);
+  });
+
+  test("tapTaskOption", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) =>
+      T.fromIO(() => (value < 2 ? O.none : O.some(ref.push(value))));
+
+    await pipe(
+      AI.fromIterable([O.some(1), O.none, O.some(3)]),
+      AIO.tapTaskOption(add),
+      AI.toArraySeq(),
+      T.map((value) => expect(value).toStrictEqual([O.none, O.none, O.some(3)]))
+    )();
+
+    expect(ref).toStrictEqual([3]);
+  });
+
+  test("tapTaskEither", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) =>
+      T.fromIO(() => (value < 2 ? E.left("left") : E.right(ref.push(value))));
+
+    await pipe(
+      AI.fromIterable([O.some(1), O.none, O.some(3)]),
+      AIO.tapTaskEither(add),
+      AI.toArraySeq(),
+      T.map((value) => expect(value).toStrictEqual([O.none, O.none, O.some(3)]))
+    )();
+
+    expect(ref).toStrictEqual([3]);
   });
 });

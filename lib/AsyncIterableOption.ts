@@ -33,6 +33,7 @@ import { IO } from "fp-ts/IO";
 import { Monad1 } from "fp-ts/Monad";
 import { MonadIO1 } from "fp-ts/MonadIO";
 import { MonadTask1 } from "fp-ts/MonadTask";
+import { MonadThrow1 } from "fp-ts/MonadThrow";
 import * as O from "fp-ts/Option";
 import { Option } from "fp-ts/Option";
 import * as OT from "fp-ts/OptionT";
@@ -46,6 +47,7 @@ import { TaskEither } from "fp-ts/TaskEither";
 import * as TO from "fp-ts/TaskOption";
 import { LazyArg, flow, identity, pipe } from "fp-ts/function";
 import * as AI from "./AsyncIterable";
+import { AsyncIterableEither } from "./AsyncIterableEither";
 import { reduceUntilWithIndexLimited } from "./AsyncIterableReduce";
 import * as I from "./Iterable";
 import {
@@ -58,7 +60,7 @@ import {
 } from "./internal";
 import { tapEither as tapEither_ } from "./internalEither";
 import { flatMap as flatMap_ } from "./internalOption";
-import { AsyncIterableEither } from "./AsyncIterableEither";
+import { TaskOption } from "fp-ts/TaskOption";
 
 /**
  * @category model
@@ -191,11 +193,17 @@ export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
   /*#__PURE__*/ fromEitherK_(FromEither);
 
 /**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const someIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) =>
+  AI.fromIO(() => pipe(fa(), O.some));
+
+/**
  * @category conversions
  * @since 1.0.0
  */
-export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) =>
-  AI.fromIO(() => pipe(fa(), O.some));
+export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = someIO;
 
 /**
  * @category conversions
@@ -230,10 +238,18 @@ export const fromTask: <A>(fa: Task<A>) => AsyncIterableOption<A> = someTask;
  * @category conversions
  * @since 1.0.0
  */
-export const fromTaskEither: <A>(
-  fa: TaskEither<unknown, A>
+export const fromTaskEither: <_, A>(
+  fa: TaskEither<_, A>
 ) => AsyncIterableOption<A> = (fa) =>
   AI.fromTask(pipe(fa, T.map(O.fromEither)));
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromTaskEitherK = <E, A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => TaskEither<E, B>
+): ((...a: A) => AsyncIterableOption<B>) => flow(f, fromTaskEither);
 
 /**
  * @category conversions
@@ -242,6 +258,14 @@ export const fromTaskEither: <A>(
 export const fromTaskOption: <A>(
   fa: TO.TaskOption<A>
 ) => AsyncIterableOption<A> = (fa) => AI.fromTask(fa);
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromTaskOptionK = <A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => TaskOption<B>
+): ((...a: A) => AsyncIterableOption<B>) => flow(f, fromTaskOption);
 
 /**
  * @category pattern matching
@@ -624,6 +648,21 @@ export const Monad: Monad1<URI> = {
  * @category instances
  * @since 1.0.0
  */
+export const throwError: MonadThrow1<URI>["throwError"] = none;
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
+export const MonadThrow: MonadThrow1<URI> = {
+  ...Monad,
+  throwError,
+};
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
 export const MonadIO: MonadIO1<URI> = {
   ...Monad,
   fromIO,
@@ -696,6 +735,46 @@ export const tapTask: {
     f: (a: A) => Task<_>
   ): AsyncIterableOption<A>;
 } = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const tapTaskEither: {
+  <A, _E, _B>(f: (a: A) => TaskEither<_E, _B>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
+  <A, _E, _B>(
+    self: AsyncIterableOption<A>,
+    f: (a: A) => TaskEither<_E, _B>
+  ): AsyncIterableOption<A>;
+} = /*#__PURE__*/ dual(
+  2,
+  <A, _E, _B>(
+    self: AsyncIterableOption<A>,
+    f: (a: A) => TaskEither<_E, _B>
+  ): AsyncIterableOption<A> => tap(self, fromTaskEitherK(f))
+);
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const tapTaskOption: {
+  <A, _>(f: (a: A) => TaskOption<_>): (
+    self: AsyncIterableOption<A>
+  ) => AsyncIterableOption<A>;
+  <A, _>(
+    self: AsyncIterableOption<A>,
+    f: (a: A) => TaskOption<_>
+  ): AsyncIterableOption<A>;
+} = /*#__PURE__*/ dual(
+  2,
+  <A, _>(
+    self: AsyncIterableOption<A>,
+    f: (a: A) => TaskOption<_>
+  ): AsyncIterableOption<A> => tap(self, fromTaskOptionK(f))
+);
 
 // -------------------------------------------------------------------------------------
 // do notation
