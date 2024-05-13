@@ -28,16 +28,21 @@ Added in v1.0.0
   - [tapIO](#tapio)
   - [tapTask](#taptask)
 - [constructors](#constructors)
+  - [none](#none)
   - [of](#of)
   - [some](#some)
+  - [someIterable](#someiterable)
   - [someTask](#sometask)
+  - [zero](#zero)
 - [conversions](#conversions)
   - [fromEither](#fromeither)
   - [fromIO](#fromio)
+  - [fromIterable](#fromiterable)
   - [fromNullable](#fromnullable)
   - [fromOption](#fromoption)
   - [fromTask](#fromtask)
   - [fromTaskEither](#fromtaskeither)
+  - [fromTaskOption](#fromtaskoption)
 - [do notation](#do-notation)
   - [Do](#do)
   - [apS](#aps)
@@ -73,7 +78,11 @@ Added in v1.0.0
 - [interop](#interop)
   - [tryCatch](#trycatch)
 - [lifting](#lifting)
+  - [fromEitherK](#fromeitherk)
+  - [fromIOK](#fromiok)
+  - [fromOptionK](#fromoptionk)
   - [fromPredicate](#frompredicate)
+  - [fromTaskK](#fromtaskk)
 - [mapping](#mapping)
   - [as](#as)
   - [asUnit](#asunit)
@@ -88,7 +97,10 @@ Added in v1.0.0
   - [matchW](#matchw)
 - [sequencing](#sequencing)
   - [flatMap](#flatmap)
+  - [flatMapEither](#flatmapeither)
+  - [flatMapOption](#flatmapoption)
   - [flatMapTask](#flatmaptask)
+  - [flatMapTaskEither](#flatmaptaskeither)
   - [flatMapTaskOption](#flatmaptaskoption)
   - [flatten](#flatten)
 - [type lambdas](#type-lambdas)
@@ -184,6 +196,16 @@ Added in v1.0.0
 
 # constructors
 
+## none
+
+**Signature**
+
+```ts
+export declare const none: () => AsyncIterableOption<never>
+```
+
+Added in v1.0.0
+
 ## of
 
 **Signature**
@@ -204,12 +226,32 @@ export declare const some: <A>(a: A) => AsyncIterableOption<A>
 
 Added in v1.0.0
 
+## someIterable
+
+**Signature**
+
+```ts
+export declare const someIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
 ## someTask
 
 **Signature**
 
 ```ts
 export declare const someTask: <A>(a: T.Task<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
+## zero
+
+**Signature**
+
+```ts
+export declare const zero: <A>() => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -232,6 +274,16 @@ Added in v1.0.0
 
 ```ts
 export declare const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
+## fromIterable
+
+**Signature**
+
+```ts
+export declare const fromIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -271,7 +323,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fromTaskEither: <A>(fa: TaskEither<unknown, A>) => AsyncIterableOption<A>
+export declare const fromTaskEither: <A>(fa: TE.TaskEither<unknown, A>) => AsyncIterableOption<A>
+```
+
+Added in v1.0.0
+
+## fromTaskOption
+
+**Signature**
+
+```ts
+export declare const fromTaskOption: <A>(fa: TO.TaskOption<A>) => AsyncIterableOption<A>
 ```
 
 Added in v1.0.0
@@ -598,6 +660,42 @@ Added in v1.0.0
 
 # lifting
 
+## fromEitherK
+
+**Signature**
+
+```ts
+export declare const fromEitherK: <E, A extends readonly unknown[], B>(
+  f: (...a: A) => Either<E, B>
+) => (...a: A) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## fromIOK
+
+**Signature**
+
+```ts
+export declare const fromIOK: <A extends readonly unknown[], B>(
+  f: (...a: A) => IO<B>
+) => (...a: A) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## fromOptionK
+
+**Signature**
+
+```ts
+export declare const fromOptionK: <A extends readonly unknown[], B>(
+  f: (...a: A) => O.Option<B>
+) => (...a: A) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
 ## fromPredicate
 
 **Signature**
@@ -608,6 +706,18 @@ export declare const fromPredicate: {
   <A>(predicate: Predicate<A>): <B extends A>(b: B) => AsyncIterableOption<B>
   <A>(predicate: Predicate<A>): (a: A) => AsyncIterableOption<A>
 }
+```
+
+Added in v1.0.0
+
+## fromTaskK
+
+**Signature**
+
+```ts
+export declare const fromTaskK: <A extends readonly unknown[], B>(
+  f: (...a: A) => T.Task<B>
+) => (...a: A) => AsyncIterableOption<B>
 ```
 
 Added in v1.0.0
@@ -752,6 +862,30 @@ export declare const flatMap: {
 
 Added in v1.0.0
 
+## flatMapEither
+
+**Signature**
+
+```ts
+export declare const flatMapEither: <E, A, B>(
+  f: (a: A) => Either<E, B>
+) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## flatMapOption
+
+**Signature**
+
+```ts
+export declare const flatMapOption: <A, B>(
+  f: (a: A) => O.Option<B>
+) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
 ## flatMapTask
 
 **Signature**
@@ -759,6 +893,18 @@ Added in v1.0.0
 ```ts
 export declare const flatMapTask: <A, B>(
   f: (a: A) => T.Task<B>
+) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## flatMapTaskEither
+
+**Signature**
+
+```ts
+export declare const flatMapTaskEither: <E, A, B>(
+  f: (a: A) => TE.TaskEither<E, B>
 ) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B>
 ```
 

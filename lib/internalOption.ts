@@ -1,7 +1,6 @@
 import { HKT, Kind, URIS } from "fp-ts/HKT";
 import { Monad, Monad1 } from "fp-ts/Monad";
-import { Option, match } from "fp-ts/Option";
-import { zero } from "fp-ts/OptionT";
+import { Option, match, none } from "fp-ts/Option";
 
 /** @internal */
 export function flatMap<M extends URIS>(
@@ -24,10 +23,9 @@ export function flatMap<M>(
   ma: HKT<M, Option<A>>,
   f: (a: A) => HKT<M, Option<B>>
 ) => HKT<M, Option<B>> {
-  const zeroM = zero(M);
   return (ma, f) =>
     M.chain(
       ma,
-      match(() => zeroM(), f)
+      match(() => M.of(none), f)
     );
 }

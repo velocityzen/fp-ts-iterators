@@ -465,4 +465,43 @@ describe("AsyncIterable", () => {
 
     expect(values).toStrictEqual("abc");
   });
+
+  test("tap", async () => {
+    const test = pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.tap((a) => AI.of(a * 2)),
+      AI.toArraySeq(),
+      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+    );
+
+    return test;
+  });
+
+  test("tapIO", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) => () => ref.push(value);
+
+    await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.tapIO(add),
+      AI.toArraySeq(),
+      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+    )();
+
+    expect(ref).toStrictEqual([1, 2, 3]);
+  });
+
+  test("tapTask", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) => T.fromIO(() => ref.push(value));
+
+    await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.tapTask(add),
+      AI.toArraySeq(),
+      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+    )();
+
+    expect(ref).toStrictEqual([1, 2, 3]);
+  });
 });

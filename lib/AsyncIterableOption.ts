@@ -20,9 +20,9 @@ import * as chainable from "fp-ts/Chain";
 import { Compactable1, compact as compact_ } from "fp-ts/Compactable";
 import { Either } from "fp-ts/Either";
 import { filterMap as filterMap_, filter as filter_ } from "fp-ts/Filterable";
-import { FromEither1 } from "fp-ts/FromEither";
-import { FromIO1 } from "fp-ts/FromIO";
-import { FromTask1 } from "fp-ts/FromTask";
+import { FromEither1, fromEitherK as fromEitherK_ } from "fp-ts/FromEither";
+import { FromIO1, fromIOK as fromIOK_ } from "fp-ts/FromIO";
+import { FromTask1, fromTaskK as fromTaskK_ } from "fp-ts/FromTask";
 import {
   Functor1,
   bindTo as bindTo_,
@@ -41,6 +41,7 @@ import { Predicate } from "fp-ts/Predicate";
 import { Refinement } from "fp-ts/Refinement";
 import * as T from "fp-ts/Task";
 import { Task } from "fp-ts/Task";
+import * as TE from "fp-ts/TaskEither";
 import { TaskEither } from "fp-ts/TaskEither";
 import * as TO from "fp-ts/TaskOption";
 import { LazyArg, flow, identity, pipe } from "fp-ts/function";
@@ -98,6 +99,28 @@ export const of: <A>(a: A) => AsyncIterableOption<A> = some;
  * @category constructors
  * @since 1.0.0
  */
+
+export const zero: <A>() => AsyncIterableOption<A> = <A>() =>
+  AI.of<Option<A>>(O.none);
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const none: () => AsyncIterableOption<never> = /*#__PURE__*/ zero;
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const someIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A> = (
+  fa
+) => AI.fromIterable(pipe(fa, I.map(O.some)));
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
 export const someTask: <A>(a: Task<A>) => AsyncIterableOption<A> = (a) =>
   AI.fromTask(pipe(a, T.map(O.some)));
 
@@ -121,21 +144,56 @@ export const fromPredicate: {
  * @category conversions
  * @since 1.0.0
  */
-export const fromOption: <A>(fa: Option<A>) => AsyncIterableOption<A> = AI.of;
+export const fromEither: <A>(fa: Either<unknown, A>) => AsyncIterableOption<A> =
+  OT.fromEither(AI.Pointed);
+
+/**
+ * @category instances
+ * @since 1.0.0
+ */
+export const FromEither: FromEither1<URI> = {
+  URI,
+  fromEither,
+};
 
 /**
  * @category conversions
  * @since 1.0.0
  */
-export const fromEither: <A>(fa: Either<unknown, A>) => AsyncIterableOption<A> =
-  OT.fromEither(AI.Pointed);
+export const fromOption: <A>(fa: Option<A>) => AsyncIterableOption<A> = AI.of;
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromOptionK: <A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => Option<B>
+) => (...a: A) => AsyncIterableOption<B> = /*#__PURE__*/ OT.fromOptionK(
+  AI.Pointed
+);
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => Either<E, B>
+) => (...a: A) => AsyncIterableOption<B> =
+  /*#__PURE__*/ fromEitherK_(FromEither);
 
 /**
  * @category conversions
  * @since 1.0.0
  */
 export const fromIO: <A>(fa: IO<A>) => AsyncIterableOption<A> = (fa) =>
-  AI.fromLazyArg(() => pipe(fa(), O.some));
+  AI.fromIO(() => pipe(fa(), O.some));
+
+/**
+ * @category conversions
+ * @since 1.0.0
+ */
+export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterableOption<A> =
+  someIterable;
 
 /**
  * @category conversions
@@ -151,6 +209,14 @@ export const fromTaskEither: <A>(
   fa: TaskEither<unknown, A>
 ) => AsyncIterableOption<A> = (fa) =>
   AI.fromTask(pipe(fa, T.map(O.fromEither)));
+
+/**
+ * @category conversions
+ * @since 1.0.0
+ */
+export const fromTaskOption: <A>(
+  fa: TO.TaskOption<A>
+) => AsyncIterableOption<A> = (fa) => AI.fromTask(fa);
 
 /**
  * @category pattern matching
@@ -289,12 +355,58 @@ export const flatMap: {
  * @category sequencing
  * @since 1.0.0
  */
+export const flatMapEither =
+  <E, A, B>(f: (a: A) => Either<E, B>) =>
+  (fa: AsyncIterableOption<A>): AsyncIterableOption<B> => ({
+    async *[Symbol.asyncIterator]() {
+      for await (const a of fa) {
+        yield pipe(a, O.flatMap(flow(f, O.fromEither)));
+      }
+    },
+  });
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export const flatMapOption =
+  <A, B>(f: (a: A) => Option<B>) =>
+  (fa: AsyncIterableOption<A>): AsyncIterableOption<B> => ({
+    async *[Symbol.asyncIterator]() {
+      for await (const a of fa) {
+        yield pipe(a, O.flatMap(f));
+      }
+    },
+  });
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
 export const flatMapTask =
   <A, B>(f: (a: A) => T.Task<B>) =>
   (fa: AsyncIterableOption<A>): AsyncIterableOption<B> => ({
     async *[Symbol.asyncIterator]() {
       for await (const a of fa) {
         yield await pipe(a, TO.fromOption, TO.flatMapTask(f))();
+      }
+    },
+  });
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export const flatMapTaskEither =
+  <E, A, B>(f: (a: A) => TE.TaskEither<E, B>) =>
+  (fa: AsyncIterableOption<A>): AsyncIterableOption<B> => ({
+    async *[Symbol.asyncIterator]() {
+      for await (const a of fa) {
+        yield await pipe(
+          a,
+          TO.fromOption,
+          TO.flatMap(flow(f, T.map(O.fromEither)))
+        )();
       }
     },
   });
@@ -442,19 +554,18 @@ export const Chain: chainable.Chain1<URI> = {
  * @category instances
  * @since 1.0.0
  */
-export const FromEither: FromEither1<URI> = {
-  URI,
-  fromEither,
-};
-
-/**
- * @category instances
- * @since 1.0.0
- */
 export const FromIO: FromIO1<URI> = {
   URI,
   fromIO,
 };
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromIOK: <A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => IO<B>
+) => (...a: A) => AsyncIterableOption<B> = /*#__PURE__*/ fromIOK_(FromIO);
 
 /**
  * @category instances
@@ -465,6 +576,14 @@ export const FromTask: FromTask1<URI> = {
   fromIO,
   fromTask,
 };
+
+/**
+ * @category lifting
+ * @since 1.0.0
+ */
+export const fromTaskK: <A extends ReadonlyArray<unknown>, B>(
+  f: (...a: A) => T.Task<B>
+) => (...a: A) => AsyncIterableOption<B> = /*#__PURE__*/ fromTaskK_(FromTask);
 
 /**
  * @category instances
@@ -514,15 +633,15 @@ export const tap: {
  * @category combinators
  * @since 1.0.0
  */
-export const tapTask: {
-  <A, _>(f: (a: A) => Task<_>): (
+export const tapEither: {
+  <A, E, _>(f: (a: A) => Either<E, _>): (
     self: AsyncIterableOption<A>
   ) => AsyncIterableOption<A>;
-  <A, _>(
+  <A, E, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => Task<_>
+    f: (a: A) => Either<E, _>
   ): AsyncIterableOption<A>;
-} = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
+} = /*#__PURE__*/ dual(2, tapEither_(FromEither, Chain));
 
 /**
  * @category combinators
@@ -542,15 +661,15 @@ export const tapIO: {
  * @category combinators
  * @since 1.0.0
  */
-export const tapEither: {
-  <A, E, _>(f: (a: A) => Either<E, _>): (
+export const tapTask: {
+  <A, _>(f: (a: A) => Task<_>): (
     self: AsyncIterableOption<A>
   ) => AsyncIterableOption<A>;
-  <A, E, _>(
+  <A, _>(
     self: AsyncIterableOption<A>,
-    f: (a: A) => Either<E, _>
+    f: (a: A) => Task<_>
   ): AsyncIterableOption<A>;
-} = /*#__PURE__*/ dual(2, tapEither_(FromEither, Chain));
+} = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
 
 // -------------------------------------------------------------------------------------
 // do notation

@@ -104,14 +104,14 @@ declare module "fp-ts/HKT" {
  * @since 1.0.0
  */
 export const left: <E = never, A = never>(e: E) => AsyncIterableEither<E, A> =
-  /*#__PURE__*/ ET.left(AI.Pointed);
+  ET.left(AI.Pointed);
 
 /**
  * @category constructors
  * @since 1.0.0
  */
 export const right: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
-  /*#__PURE__*/ ET.right(AI.Pointed);
+  ET.right(AI.Pointed);
 
 /**
  * @category constructors
@@ -160,7 +160,7 @@ export const of: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
  */
 export const rightAsyncIterable: <E = never, A = never>(
   ma: AsyncIterable<A>
-) => AsyncIterableEither<E, A> = /*#__PURE__*/ ET.rightF(AI.Functor);
+) => AsyncIterableEither<E, A> = ET.rightF(AI.Functor);
 
 /**
  * @category constructors
@@ -168,7 +168,7 @@ export const rightAsyncIterable: <E = never, A = never>(
  */
 export const leftAsyncIterable: <E = never, A = never>(
   me: AsyncIterable<E>
-) => AsyncIterableEither<E, A> = /*#__PURE__*/ ET.leftF(AI.Functor);
+) => AsyncIterableEither<E, A> = ET.leftF(AI.Functor);
 
 /**
  * @category constructors
@@ -176,10 +176,7 @@ export const leftAsyncIterable: <E = never, A = never>(
  */
 export const rightIO: <E = never, A = never>(
   ma: IO<A>
-) => AsyncIterableEither<E, A> = /*#__PURE__*/ flow(
-  AI.fromIO,
-  rightAsyncIterable
-);
+) => AsyncIterableEither<E, A> = flow(AI.fromIO, rightAsyncIterable);
 
 /**
  * @category constructors
@@ -187,10 +184,7 @@ export const rightIO: <E = never, A = never>(
  */
 export const leftIO: <E = never, A = never>(
   me: IO<E>
-) => AsyncIterableEither<E, A> = /*#__PURE__*/ flow(
-  AI.fromIO,
-  leftAsyncIterable
-);
+) => AsyncIterableEither<E, A> = flow(AI.fromIO, leftAsyncIterable);
 
 // -------------------------------------------------------------------------------------
 // conversions
@@ -375,7 +369,7 @@ export function tryCatchToError<A>() {
  */
 export const toUnion: <E, A>(
   fa: AsyncIterableEither<E, A>
-) => AsyncIterable<E | A> = /*#__PURE__*/ ET.toUnion(AI.Functor);
+) => AsyncIterable<E | A> = ET.toUnion(AI.Functor);
 
 /**
  * @category conversions
@@ -383,15 +377,16 @@ export const toUnion: <E, A>(
  */
 export const fromNullable: <E>(
   e: E
-) => <A>(a: A) => AsyncIterableEither<E, NonNullable<A>> =
-  /*#__PURE__*/ ET.fromNullable(AI.Pointed);
+) => <A>(a: A) => AsyncIterableEither<E, NonNullable<A>> = ET.fromNullable(
+  AI.Pointed
+);
 
 /**
  * @since 1.0.0
  */
 export const swap: <E, A>(
   ma: AsyncIterableEither<E, A>
-) => AsyncIterableEither<A, E> = /*#__PURE__*/ ET.swap(AI.Functor);
+) => AsyncIterableEither<A, E> = ET.swap(AI.Functor);
 
 /**
  * `map` can be used to turn functions `(a: A) => B` into functions `(fa: F<A>) => F<B>` whose argument and return types
@@ -402,8 +397,9 @@ export const swap: <E, A>(
  */
 export const map: <A, B>(
   f: (a: A) => B
-) => <E>(fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B> =
-  /*#__PURE__*/ ET.map(AI.Functor);
+) => <E>(fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B> = ET.map(
+  AI.Functor
+);
 
 /**
  * Returns a `AsyncIterableEither` whose failure and success channels have been mapped by the specified pair of functions, `f` and `g`.
@@ -421,7 +417,7 @@ export const mapBoth: {
     f: (e: E) => G,
     g: (a: A) => B
   ): AsyncIterableEither<G, B>;
-} = /*#__PURE__*/ dual(3, mapBoth_(AI.Functor));
+} = dual(3, mapBoth_(AI.Functor));
 
 /**
  * Returns a `AsyncIterableEither` with its error channel mapped using the specified function.
@@ -437,7 +433,7 @@ export const mapError: {
     self: AsyncIterableEither<E, A>,
     f: (e: E) => G
   ): AsyncIterableEither<G, A>;
-} = /*#__PURE__*/ dual(2, mapError_(AI.Functor));
+} = dual(2, mapError_(AI.Functor));
 
 /**
  * @category apply
@@ -447,7 +443,7 @@ export const ap: <E, A>(
   fa: AsyncIterableEither<E, A>
 ) => <B>(
   fab: AsyncIterableEither<E, (a: A) => B>
-) => AsyncIterableEither<E, B> = /*#__PURE__*/ ET.ap(AI.Apply);
+) => AsyncIterableEither<E, B> = ET.ap(AI.Apply);
 
 /**
  * Less strict version of [`ap`](#ap).
@@ -475,7 +471,7 @@ export const flatMap: {
     ma: AsyncIterableEither<E1, A>,
     f: (a: A) => AsyncIterableEither<E2, B>
   ): AsyncIterableEither<E1 | E2, B>;
-} = /*#__PURE__*/ dual(2, flatMap_(AI.Monad));
+} = dual(2, flatMap_(AI.Monad));
 
 /**
  * @category sequencing
@@ -656,8 +652,7 @@ export const FromIO: FromIO2<URI> = {
  */
 export const fromIOK: <A extends ReadonlyArray<unknown>, B>(
   f: (...a: A) => IO<B>
-) => <E = never>(...a: A) => AsyncIterableEither<E, B> =
-  /*#__PURE__*/ fromIOK_(FromIO);
+) => <E = never>(...a: A) => AsyncIterableEither<E, B> = fromIOK_(FromIO);
 
 /**
  * @category instances
@@ -675,8 +670,7 @@ export const FromTask: FromTask2<URI> = {
  */
 export const fromTaskK: <A extends ReadonlyArray<unknown>, B>(
   f: (...a: A) => T.Task<B>
-) => <E = never>(...a: A) => AsyncIterableEither<E, B> =
-  /*#__PURE__*/ fromTaskK_(FromTask);
+) => <E = never>(...a: A) => AsyncIterableEither<E, B> = fromTaskK_(FromTask);
 
 /**
  * @category instances
@@ -693,8 +687,7 @@ export const FromEither: FromEither2<URI> = {
  */
 export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
   f: (...a: A) => E.Either<E, B>
-) => (...a: A) => AsyncIterableEither<E, B> =
-  /*#__PURE__*/ fromEitherK_(FromEither);
+) => (...a: A) => AsyncIterableEither<E, B> = fromEitherK_(FromEither);
 
 /**
  * @category conversions
@@ -703,7 +696,7 @@ export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
 export const fromOption: <E>(
   onNone: LazyArg<E>
 ) => <A>(fa: O.Option<A>) => AsyncIterableEither<E, A> =
-  /*#__PURE__*/ fromOption_(FromEither);
+  fromOption_(FromEither);
 
 /**
  * @category lifting
@@ -713,8 +706,7 @@ export const fromOptionK: <E>(
   onNone: LazyArg<E>
 ) => <A extends ReadonlyArray<unknown>, B>(
   f: (...a: A) => O.Option<B>
-) => (...a: A) => AsyncIterableEither<E, B> =
-  /*#__PURE__*/ fromOptionK_(FromEither);
+) => (...a: A) => AsyncIterableEither<E, B> = fromOptionK_(FromEither);
 
 /**
  * @category lifting
@@ -730,7 +722,7 @@ export const fromPredicate: {
   <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): (
     a: A
   ) => AsyncIterableEither<E, A>;
-} = /*#__PURE__*/ fromPredicate_(FromEither);
+} = fromPredicate_(FromEither);
 
 /**
 
@@ -776,7 +768,7 @@ export const tap: {
   <A, E2, _>(f: (a: A) => AsyncIterableEither<E2, _>): <E1>(
     self: AsyncIterableEither<E1, A>
   ) => AsyncIterableEither<E2 | E1, A>;
-} = /*#__PURE__*/ dual(2, tap_(Chain));
+} = dual(2, tap_(Chain));
 
 /**
  * @category combinators
@@ -790,7 +782,7 @@ export const tapTask: {
     self: AsyncIterableEither<E, A>,
     f: (a: A) => T.Task<_>
   ): AsyncIterableEither<E, A>;
-} = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
+} = dual(2, tapTask_(FromTask, Chain));
 
 /**
  * @category combinators
@@ -804,7 +796,7 @@ export const tapIO: {
     self: AsyncIterableEither<E, A>,
     f: (a: A) => IO<_>
   ): AsyncIterableEither<E, A>;
-} = /*#__PURE__*/ dual(2, tapIO_(FromIO, Chain));
+} = dual(2, tapIO_(FromIO, Chain));
 
 /**
  * @category combinators
@@ -818,7 +810,7 @@ export const tapEither: {
     self: AsyncIterableEither<E1, A>,
     f: (a: A) => Either<E2, _>
   ): AsyncIterableEither<E1 | E2, A>;
-} = /*#__PURE__*/ dual(2, tapEither_(FromEither, Chain));
+} = dual(2, tapEither_(FromEither, Chain));
 
 /**
  * Returns an effect that effectfully "peeks" at the failure of this effect.
@@ -834,7 +826,7 @@ export const tapError: {
     self: AsyncIterableEither<E1, A>,
     onLeft: (e: E1) => AsyncIterableEither<E2, _>
   ): AsyncIterableEither<E1 | E2, A>;
-} = /*#__PURE__*/ dual(2, tapError_(AI.Monad));
+} = dual(2, tapError_(AI.Monad));
 
 /**
  * @category error handling
@@ -866,7 +858,7 @@ export const tapErrorTask: <E, B>(
  */
 export const flattenW: <E1, E2, A>(
   mma: AsyncIterableEither<E1, AsyncIterableEither<E2, A>>
-) => AsyncIterableEither<E1 | E2, A> = /*#__PURE__*/ flatMap(identity);
+) => AsyncIterableEither<E1 | E2, A> = flatMap(identity);
 
 /**
  * @category sequencing
@@ -883,7 +875,7 @@ export const flatten: <E, A>(
  * @category do notation
  * @since 1.0.0
  */
-export const Do: AsyncIterableEither<never, {}> = /*#__PURE__*/ of({});
+export const Do: AsyncIterableEither<never, {}> = of({});
 
 /**
  * @category do notation
@@ -909,7 +901,7 @@ export {
  * @category do notation
  * @since 1.0.0
  */
-export const apS = /*#__PURE__*/ apS_(Apply);
+export const apS = apS_(Apply);
 
 /**
  * the order of the results does not corresponds to the order of async iterator elements
