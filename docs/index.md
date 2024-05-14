@@ -8,17 +8,19 @@ has_toc: false
 
 # Iterable with fp-ts
 
-- [Generator](/fp-ts-iterators/docs/modules/Generator.ts.html)
-- [Iterable](/fp-ts-iterators/docs/modules/Iterable.ts.html)
+- [Generator](https://velocityzen.github.io/fp-ts-iterators/docs/modules/Generator.ts.html)
+- [Iterable](https://velocityzen.github.io/fp-ts-iterators/docs/modules/Iterable.ts.html)
 
 # AsyncIterable with fp-ts
 
-- [AsyncGenerator](/fp-ts-iterators/docs/modules/AsyncGenerator.ts.html)
-- [AsyncIterable](/fp-ts-iterators/docs/modules/AsyncIterable.ts.html)
-- [AsyncIterableEither](/fp-ts-iterators/docs/modules/AsyncIterableEither.ts.html)
-- [AsyncIterableOption](/fp-ts-iterators/docs/modules/AsyncIterableOption.ts.html)
+- [AsyncGenerator](https://velocityzen.github.io/fp-ts-iterators/docs/modules/AsyncGenerator.ts.html)
+- [AsyncIterable](https://velocityzen.github.io/fp-ts-iterators/docs/modules/AsyncIterable.ts.html)
+- [AsyncIterableEither](https://velocityzen.github.io/fp-ts-iterators/docs/modules/AsyncIterableEither.ts.html)
+- [AsyncIterableOption](https://velocityzen.github.io/fp-ts-iterators/docs/modules/AsyncIterableOption.ts.html)
 
-# All Iterables are lazy and to make them "run" they have to be pulled. For example you can use:
+# Usage
+
+All Iterables are lazy and to make them "run" they have to be pulled. For example you can use:
 
 ```ts
 import { AsyncIterable as AI } from "fp-ts-iterators";

@@ -17,7 +17,7 @@ npm install fp-ts fp-ts-iterators
 
 **Disclaimer**. Teaching functional programming is out of scope of this project, so the documentation assumes you already know what FP is.
 
-- [docs](velocityzen.github.io/fp-ts-iterators)
+- [docs](https://velocityzen.github.io/fp-ts-iterators/)
 - [fp-ts docs](https://gcanti.github.io/fp-ts)
 - [ecosystem](https://gcanti.github.io/fp-ts/ecosystem/)
 
