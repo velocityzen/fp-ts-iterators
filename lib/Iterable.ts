@@ -458,7 +458,7 @@ export const lefts = <E, A>(ai: Iterable<Either<E, A>>): Iterable<E> => ({
 /**
  * Creates a new `Iterable` removing duplicate elements, keeping the first occurrence of an element,
  * based on a `Eq<A>`.
-
+ * @category filtering
  * @since 1.0.0
  */
 export const uniq =
