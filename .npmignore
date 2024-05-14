@@ -1,3 +1,7 @@
 tests/
 lib/
 docs/
+coverage/
+.github/
+jest.config.json
+docs-ts.json
