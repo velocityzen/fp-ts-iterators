@@ -48,6 +48,7 @@ Added in v1.0.0
   - [filterWithIndex](#filterwithindex)
   - [lefts](#lefts)
   - [rights](#rights)
+  - [uniq](#uniq)
 - [folding](#folding)
   - [foldMap](#foldmap)
   - [foldMapWithIndex](#foldmapwithindex)
@@ -77,8 +78,6 @@ Added in v1.0.0
 - [type lambdas](#type-lambdas)
   - [URI](#uri)
   - [URI (type alias)](#uri-type-alias)
-- [utils](#utils)
-  - [uniq](#uniq)
 
 ---
 
@@ -370,6 +369,19 @@ export declare const rights: <E, A>(fa: Iterable<Either<E, A>>) => Iterable<A>
 
 Added in v1.0.0
 
+## uniq
+
+Creates a new `Iterable` removing duplicate elements, keeping the first occurrence of an element,
+based on a `Eq<A>`.
+
+**Signature**
+
+```ts
+export declare const uniq: <A>(E: Eq<A>) => (fa: Iterable<A>) => Iterable<A>
+```
+
+Added in v1.0.0
+
 # folding
 
 ## foldMap
@@ -623,21 +635,6 @@ Added in v1.0.0
 
 ```ts
 export type URI = typeof URI
-```
-
-Added in v1.0.0
-
-# utils
-
-## uniq
-
-Creates a new `Iterable` removing duplicate elements, keeping the first occurrence of an element,
-based on a `Eq<A>`.
-
-**Signature**
-
-```ts
-export declare const uniq: <A>(E: Eq<A>) => (fa: Iterable<A>) => Iterable<A>
 ```
 
 Added in v1.0.0
