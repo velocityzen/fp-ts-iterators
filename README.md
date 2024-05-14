@@ -1,5 +1,8 @@
 # AsyncIterable and Iterable with fp-ts
 
+[![NPM Version](https://img.shields.io/npm/v/fp-ts-iterators.svg?style=flat-square)](https://www.npmjs.com/package/fp-ts-iterators)
+[![NPM Downloads](https://img.shields.io/npm/dt/fp-ts-iterators.svg?style=flat-square)](https://www.npmjs.com/package/fp-ts-iterators)
+
 ## Installation
 
 To install the stable version:
