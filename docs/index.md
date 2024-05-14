@@ -8,15 +8,15 @@ has_toc: false
 
 # Iterable with fp-ts
 
-- [Generator](/fp-ts-iterators/modules/Generator.ts.html)
-- [Iterable](/fp-ts-iterators/modules/Iterable.ts.html)
+- [Generator](/fp-ts-iterators/docs/modules/Generator.ts.html)
+- [Iterable](/fp-ts-iterators/docs/modules/Iterable.ts.html)
 
 # AsyncIterable with fp-ts
 
-- [AsyncGenerator](/fp-ts-iterators/modules/AsyncGenerator.ts.html)
-- [AsyncIterable](/fp-ts-iterators/modules/AsyncIterable.ts.html)
-- [AsyncIterableEither](/fp-ts-iterators/modules/AsyncIterableEither.ts.html)
-- [AsyncIterableOption](/fp-ts-iterators/modules/AsyncIterableOption.ts.html)
+- [AsyncGenerator](/fp-ts-iterators/docs/modules/AsyncGenerator.ts.html)
+- [AsyncIterable](/fp-ts-iterators/docs/modules/AsyncIterable.ts.html)
+- [AsyncIterableEither](/fp-ts-iterators/docs/modules/AsyncIterableEither.ts.html)
+- [AsyncIterableOption](/fp-ts-iterators/docs/modules/AsyncIterableOption.ts.html)
 
 # All Iterables are lazy and to make them "run" they have to be pulled. For example you can use:
 
