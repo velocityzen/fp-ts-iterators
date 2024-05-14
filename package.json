@@ -40,7 +40,7 @@
   "bugs": {
     "url": "https://github.com/velocityzen/fp-ts-iterators/issues"
   },
-  "homepage": "https://github.com/velocityzen/fp-ts-iterators#readme",
+  "homepage": "https://velocityzen.github.io/fp-ts-iterators/",
   "peerDependencies": {
     "fp-ts": "^2.16.0"
   },

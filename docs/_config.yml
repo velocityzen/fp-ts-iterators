@@ -5,5 +5,9 @@ search_enabled: true
 
 # Aux links for the upper right navigation
 aux_links:
-  'fp-ts-iterators on GitHub':
-    - 'https://github.com/velocityzen/fp-ts-iterators#readme'
+  "Docs":
+    - "//velocityzen.github.io/fp-ts-iterators/"
+  "API Reference":
+    - "//velocityzen.github.io/fp-ts-iterators/docs/modules"
+  "GitHub":
+    - "//github.com/velocityzen/fp-ts-iterators"
