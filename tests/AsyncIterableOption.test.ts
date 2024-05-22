@@ -6,6 +6,7 @@ import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import * as AI from "../lib/AsyncIterable";
 import * as AIO from "../lib/AsyncIterableOption";
+import * as AIE from "../lib/AsyncIterableEither";
 import { createTestAsyncIterable } from "./helpers";
 
 describe("AsyncIterableEither", () => {
@@ -175,6 +176,63 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => expect(values).toStrictEqual([O.none]))
     )();
+  });
+
+  test("fromIterable", () => {
+    const test = pipe(
+      AIO.fromIterable([0, 1, 2, 3, 4]),
+      AI.toArraySeq(),
+      T.map((values) =>
+        expect(values).toStrictEqual([
+          O.some(0),
+          O.some(1),
+          O.some(2),
+          O.some(3),
+          O.some(4),
+        ])
+      )
+    );
+
+    return test();
+  });
+
+  test("fromAsyncIterable", () => {
+    const test = pipe(
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AIO.fromAsyncIterable,
+      AI.toArraySeq(),
+      T.map((values) =>
+        expect(values).toStrictEqual([
+          O.some(0),
+          O.some(1),
+          O.some(2),
+          O.some(3),
+          O.some(4),
+        ])
+      )
+    );
+
+    return test();
+  });
+
+  test("fromAsyncIterableEither", () => {
+    const test = pipe(
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AIE.fromAsyncIterable,
+      AIO.fromAsyncIterableEither,
+      AI.toArraySeq(),
+      T.map((values) =>
+        expect(values).toStrictEqual([
+          O.some(0),
+          O.some(1),
+          O.some(2),
+          O.some(3),
+          O.some(4),
+        ])
+      )
+    );
+
+    return test();
   });
 
   test("fromPredicate", async () => {
@@ -428,5 +486,29 @@ describe("AsyncIterableEither", () => {
     )();
 
     expect(ref).toStrictEqual([3]);
+  });
+
+  test("compact", () => {
+    const test = pipe(
+      AIO.fromIterable([O.some(1), O.none, O.some(3)]),
+      AIO.compact,
+      AI.toArraySeq(),
+      T.map((value) =>
+        expect(value).toStrictEqual([O.some(1), O.none, O.some(3)])
+      )
+    );
+
+    return test();
+  });
+
+  test("filter", async () => {
+    const g = (n: number) => n % 2 === 1;
+    const values = await pipe(
+      AIO.fromIterable([1, 2, 3]),
+      AIO.filter(g),
+      AI.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual([O.some(1), O.none, O.some(3)]);
   });
 });
