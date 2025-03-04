@@ -6,7 +6,7 @@ import {
   Chain3,
   Chain3C,
   Chain4,
-} from "fp-ts/Chain";
+} from "fp-ts/lib/Chain";
 import {
   FromIO,
   FromIO1,
@@ -15,7 +15,7 @@ import {
   FromIO3,
   FromIO3C,
   FromIO4,
-} from "fp-ts/FromIO";
+} from "fp-ts/lib/FromIO";
 import {
   FromTask,
   FromTask1,
@@ -24,8 +24,14 @@ import {
   FromTask3,
   FromTask3C,
   FromTask4,
-} from "fp-ts/FromTask";
-import { Functor, Functor1, Functor2, Functor3, Functor4 } from "fp-ts/Functor";
+} from "fp-ts/lib/FromTask";
+import {
+  Functor,
+  Functor1,
+  Functor2,
+  Functor3,
+  Functor4,
+} from "fp-ts/lib/Functor";
 import {
   HKT,
   Kind,
@@ -36,10 +42,10 @@ import {
   URIS2,
   URIS3,
   URIS4,
-} from "fp-ts/HKT";
-import { IO } from "fp-ts/IO";
-import { Task } from "fp-ts/Task";
-import { flow } from "fp-ts/function";
+} from "fp-ts/lib/HKT";
+import { IO } from "fp-ts/lib/IO";
+import { Task } from "fp-ts/lib/Task";
+import { flow } from "fp-ts/lib/function";
 
 export * from "./internalGenerics";
 

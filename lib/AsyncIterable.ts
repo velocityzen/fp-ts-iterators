@@ -5,43 +5,43 @@
  *
  * @since 1.0.0
  */
-import { Applicative1 } from "fp-ts/Applicative";
+import { Applicative1 } from "fp-ts/lib/Applicative";
 import {
   Apply1,
   apFirst as apFirst_,
   apS as apS_,
   apSecond as apSecond_,
-} from "fp-ts/Apply";
-import * as A from "fp-ts/Array";
-import * as chainable from "fp-ts/Chain";
-import { Either } from "fp-ts/Either";
-import { Eq } from "fp-ts/Eq";
+} from "fp-ts/lib/Apply";
+import * as A from "fp-ts/lib/Array";
+import * as chainable from "fp-ts/lib/Chain";
+import { Either } from "fp-ts/lib/Either";
+import { Eq } from "fp-ts/lib/Eq";
 import {
   PredicateWithIndex,
   RefinementWithIndex,
-} from "fp-ts/FilterableWithIndex";
-import { FromIO1 } from "fp-ts/FromIO";
-import { FromTask1 } from "fp-ts/FromTask";
+} from "fp-ts/lib/FilterableWithIndex";
+import { FromIO1 } from "fp-ts/lib/FromIO";
+import { FromTask1 } from "fp-ts/lib/FromTask";
 import {
   Functor1,
   bindTo as bindTo_,
   flap as flap_,
   let as let_,
-} from "fp-ts/Functor";
-import { FunctorWithIndex1 } from "fp-ts/FunctorWithIndex";
-import { IO } from "fp-ts/IO";
-import { Monad1 } from "fp-ts/Monad";
-import { MonadIO1 } from "fp-ts/MonadIO";
-import { Monoid } from "fp-ts/Monoid";
-import * as O from "fp-ts/Option";
-import { Option } from "fp-ts/Option";
-import { Pointed1 } from "fp-ts/Pointed";
-import { Predicate } from "fp-ts/Predicate";
-import { Refinement } from "fp-ts/Refinement";
-import * as T from "fp-ts/Task";
-import { Task } from "fp-ts/Task";
-import * as TO from "fp-ts/TaskOption";
-import { Unfoldable1 } from "fp-ts/Unfoldable";
+} from "fp-ts/lib/Functor";
+import { FunctorWithIndex1 } from "fp-ts/lib/FunctorWithIndex";
+import { IO } from "fp-ts/lib/IO";
+import { Monad1 } from "fp-ts/lib/Monad";
+import { MonadIO1 } from "fp-ts/lib/MonadIO";
+import { Monoid } from "fp-ts/lib/Monoid";
+import * as O from "fp-ts/lib/Option";
+import { Option } from "fp-ts/lib/Option";
+import { Pointed1 } from "fp-ts/lib/Pointed";
+import { Predicate } from "fp-ts/lib/Predicate";
+import { Refinement } from "fp-ts/lib/Refinement";
+import * as T from "fp-ts/lib/Task";
+import { Task } from "fp-ts/lib/Task";
+import * as TO from "fp-ts/lib/TaskOption";
+import { Unfoldable1 } from "fp-ts/lib/Unfoldable";
 import {
   LazyArg,
   constTrue,
@@ -49,13 +49,13 @@ import {
   flow,
   identity,
   pipe,
-} from "fp-ts/function";
+} from "fp-ts/lib/function";
+import * as AG from "./AsyncGenerator";
 import {
   getAsyncIteratorNextTask,
   reduceUntilWithIndexLimited,
 } from "./AsyncIterableReduce";
 import * as I from "./Iterable";
-import * as AG from "./AsyncGenerator";
 import {
   asUnit as asUnit_,
   as as as_,
@@ -77,7 +77,7 @@ export const URI = "AsyncIterable";
  */
 export type URI = typeof URI;
 
-declare module "fp-ts/HKT" {
+declare module "fp-ts/lib/HKT" {
   interface URItoKind<A> {
     readonly [URI]: AsyncIterable<A>;
   }

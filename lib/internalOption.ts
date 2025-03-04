@@ -1,6 +1,6 @@
-import { HKT, Kind, URIS } from "fp-ts/HKT";
-import { Monad, Monad1 } from "fp-ts/Monad";
-import { Option, match, none } from "fp-ts/Option";
+import { HKT, Kind, URIS } from "fp-ts/lib/HKT";
+import { Monad, Monad1 } from "fp-ts/lib/Monad";
+import { Option, match, none } from "fp-ts/lib/Option";
 
 /** @internal */
 export function flatMap<M extends URIS>(

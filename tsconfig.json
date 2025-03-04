@@ -17,82 +17,82 @@
         "name": "@unsplash/ts-namespace-import-plugin",
         "namespaces": {
           "A": {
-            "importPath": "fp-ts/Array"
+            "importPath": "fp-ts/lib/Array"
           },
           "B": {
-            "importPath": "fp-ts/boolean"
+            "importPath": "fp-ts/lib/boolean"
           },
           "C": {
-            "importPath": "fp-ts/Console"
+            "importPath": "fp-ts/lib/Console"
           },
           "D": {
-            "importPath": "fp-ts/Date"
+            "importPath": "fp-ts/lib/Date"
           },
           "E": {
-            "importPath": "fp-ts/Either"
+            "importPath": "fp-ts/lib/Either"
           },
           "IO": {
-            "importPath": "fp-ts/IO"
+            "importPath": "fp-ts/lib/IO"
           },
           "IOE": {
-            "importPath": "fp-ts/IOEither"
+            "importPath": "fp-ts/lib/IOEither"
           },
           "IOO": {
-            "importPath": "fp-ts/IOOption"
+            "importPath": "fp-ts/lib/IOOption"
           },
           "J": {
-            "importPath": "fp-ts/Json"
+            "importPath": "fp-ts/lib/Json"
           },
           "N": {
-            "importPath": "fp-ts/number"
+            "importPath": "fp-ts/lib/number"
           },
           "NEA": {
-            "importPath": "fp-ts/NonEmptyArray"
+            "importPath": "fp-ts/lib/NonEmptyArray"
           },
           "O": {
-            "importPath": "fp-ts/Option"
+            "importPath": "fp-ts/lib/Option"
           },
           "P": {
-            "importPath": "fp-ts/Predicate"
+            "importPath": "fp-ts/lib/Predicate"
           },
           "R": {
-            "importPath": "fp-ts/Reader"
+            "importPath": "fp-ts/lib/Reader"
           },
           "RA": {
-            "importPath": "fp-ts/ReadonlyArray"
+            "importPath": "fp-ts/lib/ReadonlyArray"
           },
           "RE": {
-            "importPath": "fp-ts/ReaderEither"
+            "importPath": "fp-ts/lib/ReaderEither"
           },
           "RIO": {
-            "importPath": "fp-ts/ReaderIO"
+            "importPath": "fp-ts/lib/ReaderIO"
           },
           "RNEA": {
-            "importPath": "fp-ts/ReadonlyNonEmptyArray"
+            "importPath": "fp-ts/lib/ReadonlyNonEmptyArray"
           },
           "RT": {
-            "importPath": "fp-ts/ReaderTask"
+            "importPath": "fp-ts/lib/ReaderTask"
           },
           "RTE": {
-            "importPath": "fp-ts/ReaderTaskEither"
+            "importPath": "fp-ts/lib/ReaderTaskEither"
           },
           "S": {
-            "importPath": "fp-ts/string"
+            "importPath": "fp-ts/lib/string"
           },
           "T": {
-            "importPath": "fp-ts/Task"
+            "importPath": "fp-ts/lib/Task"
           },
           "TE": {
-            "importPath": "fp-ts/TaskEither"
+            "importPath": "fp-ts/lib/TaskEither"
           },
           "TT": {
-            "importPath": "fp-ts/TaskThese"
+            "importPath": "fp-ts/lib/TaskThese"
           },
           "TO": {
-            "importPath": "fp-ts/TaskOption"
+            "importPath": "fp-ts/lib/TaskOption"
           },
           "TU": {
-            "importPath": "fp-ts/Tuple"
+            "importPath": "fp-ts/lib/Tuple"
           }
         }
       }

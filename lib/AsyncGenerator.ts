@@ -5,8 +5,8 @@
  *
  * @since 1.0.0
  */
-import { Task } from "fp-ts/Task";
-import { LazyArg } from "fp-ts/function";
+import { Task } from "fp-ts/lib/Task";
+import { LazyArg } from "fp-ts/lib/function";
 import * as G from "./Generator";
 
 /**

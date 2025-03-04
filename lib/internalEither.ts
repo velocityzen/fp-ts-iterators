@@ -6,10 +6,10 @@ import {
   Chain3,
   Chain3C,
   Chain4,
-} from "fp-ts/Chain";
-import * as E from "fp-ts/Either";
-import { Either } from "fp-ts/Either";
-import * as ET from "fp-ts/EitherT";
+} from "fp-ts/lib/Chain";
+import * as E from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either";
+import * as ET from "fp-ts/lib/EitherT";
 import {
   FromEither,
   FromEither1,
@@ -19,8 +19,8 @@ import {
   FromEither3C,
   FromEither4,
   fromEitherK,
-} from "fp-ts/FromEither";
-import { Functor, Functor1, Functor2 } from "fp-ts/Functor";
+} from "fp-ts/lib/FromEither";
+import { Functor, Functor1, Functor2 } from "fp-ts/lib/Functor";
 import {
   HKT,
   HKT2,
@@ -32,9 +32,9 @@ import {
   URIS2,
   URIS3,
   URIS4,
-} from "fp-ts/HKT";
-import { Monad, Monad1, Monad2 } from "fp-ts/Monad";
-import { pipe } from "fp-ts/function";
+} from "fp-ts/lib/HKT";
+import { Monad, Monad1, Monad2 } from "fp-ts/lib/Monad";
+import { pipe } from "fp-ts/lib/function";
 import { tap } from "./internal";
 
 /** @internal */

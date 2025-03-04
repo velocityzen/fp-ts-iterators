@@ -8,44 +8,47 @@
  *
  * @since 1.0.0
  */
-import { Applicative1 } from "fp-ts/Applicative";
+import { Applicative1 } from "fp-ts/lib/Applicative";
 import {
   Apply1,
   apFirst as apFirst_,
   apS as apS_,
   apSecond as apSecond_,
-} from "fp-ts/Apply";
-import * as A from "fp-ts/Array";
-import * as chainable from "fp-ts/Chain";
-import { Compactable1, compact as compact_ } from "fp-ts/Compactable";
-import { Either } from "fp-ts/Either";
-import { filterMap as filterMap_, filter as filter_ } from "fp-ts/Filterable";
-import { FromEither1, fromEitherK as fromEitherK_ } from "fp-ts/FromEither";
-import { FromIO1, fromIOK as fromIOK_ } from "fp-ts/FromIO";
-import { FromTask1, fromTaskK as fromTaskK_ } from "fp-ts/FromTask";
+} from "fp-ts/lib/Apply";
+import * as A from "fp-ts/lib/Array";
+import * as chainable from "fp-ts/lib/Chain";
+import { Compactable1, compact as compact_ } from "fp-ts/lib/Compactable";
+import { Either } from "fp-ts/lib/Either";
+import {
+  filterMap as filterMap_,
+  filter as filter_,
+} from "fp-ts/lib/Filterable";
+import { FromEither1, fromEitherK as fromEitherK_ } from "fp-ts/lib/FromEither";
+import { FromIO1, fromIOK as fromIOK_ } from "fp-ts/lib/FromIO";
+import { FromTask1, fromTaskK as fromTaskK_ } from "fp-ts/lib/FromTask";
 import {
   Functor1,
   bindTo as bindTo_,
   flap as flap_,
   let as let_,
-} from "fp-ts/Functor";
-import { IO } from "fp-ts/IO";
-import { Monad1 } from "fp-ts/Monad";
-import { MonadIO1 } from "fp-ts/MonadIO";
-import { MonadTask1 } from "fp-ts/MonadTask";
-import { MonadThrow1 } from "fp-ts/MonadThrow";
-import * as O from "fp-ts/Option";
-import { Option } from "fp-ts/Option";
-import * as OT from "fp-ts/OptionT";
-import { Pointed1 } from "fp-ts/Pointed";
-import { Predicate } from "fp-ts/Predicate";
-import { Refinement } from "fp-ts/Refinement";
-import * as T from "fp-ts/Task";
-import { Task } from "fp-ts/Task";
-import * as TE from "fp-ts/TaskEither";
-import { TaskEither } from "fp-ts/TaskEither";
-import * as TO from "fp-ts/TaskOption";
-import { LazyArg, flow, identity, pipe } from "fp-ts/function";
+} from "fp-ts/lib/Functor";
+import { IO } from "fp-ts/lib/IO";
+import { Monad1 } from "fp-ts/lib/Monad";
+import { MonadIO1 } from "fp-ts/lib/MonadIO";
+import { MonadTask1 } from "fp-ts/lib/MonadTask";
+import { MonadThrow1 } from "fp-ts/lib/MonadThrow";
+import * as O from "fp-ts/lib/Option";
+import { Option } from "fp-ts/lib/Option";
+import * as OT from "fp-ts/lib/OptionT";
+import { Pointed1 } from "fp-ts/lib/Pointed";
+import { Predicate } from "fp-ts/lib/Predicate";
+import { Refinement } from "fp-ts/lib/Refinement";
+import * as T from "fp-ts/lib/Task";
+import { Task } from "fp-ts/lib/Task";
+import * as TE from "fp-ts/lib/TaskEither";
+import { TaskEither } from "fp-ts/lib/TaskEither";
+import * as TO from "fp-ts/lib/TaskOption";
+import { LazyArg, flow, identity, pipe } from "fp-ts/lib/function";
 import * as AI from "./AsyncIterable";
 import { AsyncIterableEither } from "./AsyncIterableEither";
 import { reduceUntilWithIndexLimited } from "./AsyncIterableReduce";
@@ -60,7 +63,7 @@ import {
 } from "./internal";
 import { tapEither as tapEither_ } from "./internalEither";
 import { flatMap as flatMap_ } from "./internalOption";
-import { TaskOption } from "fp-ts/TaskOption";
+import { TaskOption } from "fp-ts/lib/TaskOption";
 
 /**
  * @category model
@@ -80,7 +83,7 @@ export const URI = "AsyncIterableOption";
  */
 export type URI = typeof URI;
 
-declare module "fp-ts/HKT" {
+declare module "fp-ts/lib/HKT" {
   interface URItoKind<A> {
     readonly [URI]: AsyncIterableOption<A>;
   }

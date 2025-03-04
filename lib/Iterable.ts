@@ -13,41 +13,41 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { Applicative1 } from "fp-ts/Applicative";
+import { Applicative1 } from "fp-ts/lib/Applicative";
 import {
   Apply1,
   apFirst as apFirst_,
   apS as apS_,
   apSecond as apSecond_,
-} from "fp-ts/Apply";
-import * as chainable from "fp-ts/Chain";
-import { Either } from "fp-ts/Either";
-import { Eq } from "fp-ts/Eq";
+} from "fp-ts/lib/Apply";
+import * as chainable from "fp-ts/lib/Chain";
+import { Either } from "fp-ts/lib/Either";
+import { Eq } from "fp-ts/lib/Eq";
 import {
   PredicateWithIndex,
   RefinementWithIndex,
-} from "fp-ts/FilterableWithIndex";
-import { FromIO1 } from "fp-ts/FromIO";
+} from "fp-ts/lib/FilterableWithIndex";
+import { FromIO1 } from "fp-ts/lib/FromIO";
 import {
   Functor1,
   bindTo as bindTo_,
   flap as flap_,
   let as let_,
-} from "fp-ts/Functor";
-import { FunctorWithIndex1 } from "fp-ts/FunctorWithIndex";
-import { IO } from "fp-ts/IO";
-import { Monad1 } from "fp-ts/Monad";
-import { MonadIO1 } from "fp-ts/MonadIO";
-import { Monoid } from "fp-ts/Monoid";
-import { NaturalTransformation11 } from "fp-ts/NaturalTransformation";
-import * as O from "fp-ts/Option";
-import { Option } from "fp-ts/Option";
-import { Pointed1 } from "fp-ts/Pointed";
-import { Predicate } from "fp-ts/Predicate";
-import * as RA from "fp-ts/ReadonlyArray";
-import { Refinement } from "fp-ts/Refinement";
-import { Unfoldable1 } from "fp-ts/Unfoldable";
-import { identity, pipe } from "fp-ts/function";
+} from "fp-ts/lib/Functor";
+import { FunctorWithIndex1 } from "fp-ts/lib/FunctorWithIndex";
+import { IO } from "fp-ts/lib/IO";
+import { Monad1 } from "fp-ts/lib/Monad";
+import { MonadIO1 } from "fp-ts/lib/MonadIO";
+import { Monoid } from "fp-ts/lib/Monoid";
+import { NaturalTransformation11 } from "fp-ts/lib/NaturalTransformation";
+import * as O from "fp-ts/lib/Option";
+import { Option } from "fp-ts/lib/Option";
+import { Pointed1 } from "fp-ts/lib/Pointed";
+import { Predicate } from "fp-ts/lib/Predicate";
+import * as RA from "fp-ts/lib/ReadonlyArray";
+import { Refinement } from "fp-ts/lib/Refinement";
+import { Unfoldable1 } from "fp-ts/lib/Unfoldable";
+import { identity, pipe } from "fp-ts/lib/function";
 import {
   asUnit as asUnit_,
   as as as_,
@@ -68,7 +68,7 @@ export const URI = "Iterable";
  */
 export type URI = typeof URI;
 
-declare module "fp-ts/HKT" {
+declare module "fp-ts/lib/HKT" {
   export interface URItoKind<A> {
     readonly [URI]: Iterable<A>;
   }

@@ -8,46 +8,50 @@
  *
  * @since 1.0.0
  */
-import { Applicative2 } from "fp-ts/Applicative";
+import { Applicative2 } from "fp-ts/lib/Applicative";
 import {
   Apply2,
   apFirst as apFirst_,
   apS as apS_,
   apSecond as apSecond_,
-} from "fp-ts/Apply";
-import * as A from "fp-ts/Array";
-import * as chainable from "fp-ts/Chain";
-import * as E from "fp-ts/Either";
-import { Either } from "fp-ts/Either";
-import * as ET from "fp-ts/EitherT";
+} from "fp-ts/lib/Apply";
+import * as A from "fp-ts/lib/Array";
+import * as chainable from "fp-ts/lib/Chain";
+import * as E from "fp-ts/lib/Either";
+import { Either } from "fp-ts/lib/Either";
+import * as ET from "fp-ts/lib/EitherT";
+import {
+  PredicateWithIndex,
+  RefinementWithIndex,
+} from "fp-ts/lib/FilterableWithIndex";
 import {
   FromEither2,
   fromEitherK as fromEitherK_,
   fromOptionK as fromOptionK_,
   fromOption as fromOption_,
   fromPredicate as fromPredicate_,
-} from "fp-ts/FromEither";
-import { FromIO2, fromIOK as fromIOK_ } from "fp-ts/FromIO";
-import { FromTask2, fromTaskK as fromTaskK_ } from "fp-ts/FromTask";
+} from "fp-ts/lib/FromEither";
+import { FromIO2, fromIOK as fromIOK_ } from "fp-ts/lib/FromIO";
+import { FromTask2, fromTaskK as fromTaskK_ } from "fp-ts/lib/FromTask";
 import {
   Functor2,
   bindTo as bindTo_,
   flap as flap_,
   let as let_,
-} from "fp-ts/Functor";
-import { IO } from "fp-ts/IO";
-import { IOEither } from "fp-ts/IOEither";
-import { Monad2 } from "fp-ts/Monad";
-import { MonadIO2 } from "fp-ts/MonadIO";
-import { MonadThrow2 } from "fp-ts/MonadThrow";
-import * as O from "fp-ts/Option";
-import { Pointed2 } from "fp-ts/Pointed";
-import { Predicate } from "fp-ts/Predicate";
-import { Refinement } from "fp-ts/Refinement";
-import * as T from "fp-ts/Task";
-import * as TE from "fp-ts/TaskEither";
-import * as TO from "fp-ts/TaskOption";
-import { LazyArg, flow, identity, pipe } from "fp-ts/function";
+} from "fp-ts/lib/Functor";
+import { IO } from "fp-ts/lib/IO";
+import { IOEither } from "fp-ts/lib/IOEither";
+import { Monad2 } from "fp-ts/lib/Monad";
+import { MonadIO2 } from "fp-ts/lib/MonadIO";
+import { MonadThrow2 } from "fp-ts/lib/MonadThrow";
+import * as O from "fp-ts/lib/Option";
+import { Pointed2 } from "fp-ts/lib/Pointed";
+import { Predicate } from "fp-ts/lib/Predicate";
+import { Refinement } from "fp-ts/lib/Refinement";
+import * as T from "fp-ts/lib/Task";
+import * as TE from "fp-ts/lib/TaskEither";
+import * as TO from "fp-ts/lib/TaskOption";
+import { LazyArg, flow, identity, pipe } from "fp-ts/lib/function";
 import { MonadTask2 } from "fp-ts/lib/MonadTask";
 import * as AI from "./AsyncIterable";
 import { AsyncIterableOption } from "./AsyncIterableOption";
@@ -89,7 +93,7 @@ export const URI = "AsyncIterableEither";
  */
 export type URI = typeof URI;
 
-declare module "fp-ts/HKT" {
+declare module "fp-ts/lib/HKT" {
   interface URItoKind2<E, A> {
     readonly [URI]: AsyncIterableEither<E, A>;
   }
@@ -774,6 +778,261 @@ export const MonadTask: MonadTask2<URI> = {
   ...MonadIO,
   fromTask,
 };
+
+/**
+ * Same as [`filter`](#filter), but passing also the index to the iterating function.
+ *
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterWithIndex: {
+  <E, A, B extends A>(refinementWithIndex: RefinementWithIndex<number, A, B>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): <B extends A>(
+    fb: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>;
+} = <E, A>(predicateWithIndex: PredicateWithIndex<number, A>) =>
+  AI.filterWithIndex((i, a: E.Either<E, A>) => {
+    if (E.isLeft(a)) {
+      return true;
+    }
+
+    return predicateWithIndex(i, a.right);
+  });
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filter: {
+  <E, A, B extends A>(refinement: Refinement<A, B>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicate: Predicate<A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicate: Predicate<A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>;
+} = <E, A>(predicate: Predicate<A>) =>
+  filterWithIndex<E, A>((_, a) => predicate(a));
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTaskWithIndex: {
+  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): <
+    B extends A
+  >(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>;
+  /* eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters */
+} = <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>) =>
+  AI.filterTaskWithIndex<E.Either<E, A>>((i, a) => {
+    if (E.isLeft(a)) {
+      return T.of(true);
+    }
+
+    return predicateWithIndex(i, a.right);
+  });
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTask: {
+  <E, A>(predicate: AI.PredicateTask<A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicate: AI.PredicateTask<A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>;
+} = <E, A>(predicate: AI.PredicateTask<A>) =>
+  filterTaskWithIndex<E, A>((_, a) => predicate(a));
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export interface PredicateTaskEitherWithIndex<I, E, A> {
+  (i: I, a: A): TE.TaskEither<E, boolean>;
+}
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTaskEitherWithIndex: {
+  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): <
+    B extends A
+  >(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>;
+} =
+  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>) =>
+  (fa: AsyncIterableEither<E, A>) => {
+    let i = 0;
+
+    async function* next(): AsyncGenerator<E.Either<E, A>> {
+      for await (const a of fa) {
+        if (E.isLeft(a)) {
+          yield a;
+        } else {
+          const predicateEither = await predicateWithIndex(i++, a.right)();
+          if (E.isLeft(predicateEither)) {
+            yield predicateEither;
+          } else if (predicateEither.right) {
+            yield a;
+          } else {
+            yield* next();
+          }
+        }
+      }
+    }
+
+    return AI.fromAsyncGenerator(next);
+  };
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export interface PredicateTaskEither<E, A> {
+  (a: A): TE.TaskEither<E, boolean>;
+}
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterTaskEither: {
+  <E, A>(predicate: PredicateTaskEither<E, A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>;
+  <E, A>(predicate: PredicateTaskEither<E, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterable<A>;
+} = <E, A>(predicate: PredicateTaskEither<E, A>) =>
+  filterTaskEitherWithIndex<E, A>((_, a) => predicate(a));
+
+/**
+ * Same as [`filter`](#filter), but passing also the index to the iterating function.
+ *
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMapWithIndex =
+  <E, A, B>(f: (i: number, a: A) => O.Option<B>) =>
+  (fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
+    let i = 0;
+
+    async function* next(): AsyncGenerator<E.Either<E, B>> {
+      for await (const a of fa) {
+        if (E.isLeft(a)) {
+          yield a;
+        } else {
+          const optionB = f(i++, a.right);
+          if (O.isSome(optionB)) {
+            yield E.right(optionB.value);
+          } else {
+            yield* next();
+          }
+        }
+      }
+    }
+
+    return AI.fromAsyncGenerator(next);
+  };
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMap = <E, A, B>(f: (a: A) => O.Option<B>) =>
+  filterMapWithIndex<E, A, B>((_, a) => f(a));
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMapTaskWithIndex =
+  <E, A, B>(f: (i: number, a: A) => T.Task<O.Option<B>>) =>
+  (fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
+    let i = 0;
+
+    async function* next(): AsyncGenerator<E.Either<E, B>> {
+      for await (const a of fa) {
+        if (E.isLeft(a)) {
+          yield a;
+        } else {
+          const optionB = await f(i++, a.right)();
+          if (O.isSome(optionB)) {
+            yield E.right(optionB.value);
+          } else {
+            yield* next();
+          }
+        }
+      }
+    }
+
+    return AI.fromAsyncGenerator(next);
+  };
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMapTask = <E, A, B>(f: (a: A) => T.Task<O.Option<B>>) =>
+  filterMapTaskWithIndex<E, A, B>((_, a) => f(a));
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMapTaskEitherWithIndex =
+  <E, A, B>(f: (i: number, a: A) => TE.TaskEither<E, O.Option<B>>) =>
+  (fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
+    let i = 0;
+
+    async function* next(): AsyncGenerator<E.Either<E, B>> {
+      for await (const a of fa) {
+        if (E.isLeft(a)) {
+          yield a;
+        } else {
+          const eitherOptionB = await f(i++, a.right)();
+
+          if (E.isLeft(eitherOptionB)) {
+            yield eitherOptionB;
+          } else if (O.isSome(eitherOptionB.right)) {
+            yield E.right(eitherOptionB.right.value);
+          } else {
+            yield* next();
+          }
+        }
+      }
+    }
+
+    return AI.fromAsyncGenerator(next);
+  };
+
+/**
+ * @category filtering
+ * @since 1.0.0
+ */
+export const filterMapTaskEither = <E, A, B>(
+  f: (a: A) => TE.TaskEither<E, O.Option<B>>
+) => filterMapTaskEitherWithIndex<E, A, B>((_, a) => f(a));
 
 /**
  * Composes computations in sequence, using the return value of one computation to determine the next computation and

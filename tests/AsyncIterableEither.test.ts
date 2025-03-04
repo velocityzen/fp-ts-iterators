@@ -464,6 +464,179 @@ describe("AsyncIterableEither", () => {
     return test();
   });
 
+  test("filterWithIndex", async () => {
+    const f = (n: number) => n % 2 === 0;
+
+    const values = await pipe(
+      AIE.fromIterable(["a", "b", "c"]),
+      AIE.filterWithIndex(f),
+      AI.toArraySeq()
+    )();
+    expect(values).toStrictEqual([E.right("a"), E.right("c")]);
+  });
+
+  test("filter", async () => {
+    const g = (n: number) => n % 2 === 1;
+    const values = await pipe(
+      AIE.fromIterable([1, 2, 3]),
+      AIE.filter(g),
+      AI.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual([E.right(1), E.right(3)]);
+  });
+
+  test("filter keeps lefts", async () => {
+    const g = (n: number) => n % 2 === 1;
+    const values = await pipe(
+      AI.fromIterable([E.right(1), E.left(2), E.right(3)]),
+      AIE.filter(g),
+      AI.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual([E.right(1), E.left(2), E.right(3)]);
+  });
+
+  test("filter refinement all", async () => {
+    const values = await pipe(
+      AIE.fromIterable([O.some(3), O.some(2), O.some(1)]),
+      AIE.filter(O.isSome),
+      AIE.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual(E.right([O.some(3), O.some(2), O.some(1)]));
+  });
+
+  test("filter refinement some", async () => {
+    const values = await pipe(
+      AIE.fromIterable([O.some(3), O.none, O.some(1)]),
+      AIE.filter(O.isSome),
+      AIE.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual(E.right([O.some(3), O.some(1)]));
+  });
+
+  test("filterTaskWithIndex", async () => {
+    const f = (n: number) => () => Promise.resolve(n % 2 === 0);
+
+    const values = await pipe(
+      AIE.fromIterable(["a", "b", "c"]),
+      AIE.filterTaskWithIndex(f),
+      AIE.toArraySeq()
+    )();
+    expect(values).toStrictEqual(E.right(["a", "c"]));
+  });
+
+  test("filterTask", async () => {
+    const f = (n: number) => () => Promise.resolve(n % 2 === 1);
+    const values = await pipe(
+      AI.fromIterable([E.right(1), E.right(2), E.left(3)]),
+      AIE.filterTask(f),
+      AI.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual([E.right(1), E.left(3)]);
+  });
+
+  test("filterTaskEitherWithIndex", async () => {
+    const f = (n: number) => TE.of(n % 2 === 0);
+
+    const values = await pipe(
+      AIE.fromIterable(["a", "b", "c"]),
+      AIE.filterTaskEitherWithIndex(f),
+      AIE.toArraySeq()
+    )();
+    expect(values).toStrictEqual(E.right(["a", "c"]));
+  });
+
+  test("filterTaskEither", async () => {
+    const f = (n: number): TE.TaskEither<string, boolean> =>
+      T.of(n === 1 ? E.left("1") : E.right(n % 2 === 0));
+
+    const values = await pipe(
+      AI.fromIterable([E.right(1), E.left("2"), E.right(3), E.right(4)]),
+      AIE.filterTaskEither(f),
+      AI.toArraySeq()
+    )();
+
+    expect(values).toStrictEqual([E.left("1"), E.left("2"), E.right(4)]);
+  });
+
+  test("filterMapWithIndex", async () => {
+    const f = (i: number, n: number) =>
+      (i + n) % 2 === 0 ? O.none : O.some(n);
+
+    const values = await pipe(
+      AIE.fromIterable([1, 2, 4]),
+      AIE.filterMapWithIndex(f),
+      AIE.toArraySeq()
+    )();
+    expect(values).toStrictEqual(E.right([1, 2]));
+  });
+
+  test("filterMap", async () => {
+    const f = (n: number) => (n % 2 === 0 ? O.none : O.some(n));
+
+    const values = await pipe(
+      AI.fromIterable([E.left(1), E.right(2), E.right(3)]),
+      AIE.filterMap(f),
+      AI.toArraySeq()
+    )();
+    expect(values).toStrictEqual([E.left(1), E.right(3)]);
+  });
+
+  test("filterMapTaskWithIndex", async () => {
+    const f = (i: number, n: number) =>
+      T.of((i + n) % 2 === 0 ? O.none : O.some(n + 1));
+
+    const values = await pipe(
+      AIE.fromIterable([1, 2, 4]),
+      AIE.filterMapTaskWithIndex(f),
+      AIE.toArraySeq()
+    )();
+    expect(values).toStrictEqual(E.right([2, 3]));
+  });
+
+  test("filterMapTask", async () => {
+    const f = (n: number) => T.of(n % 2 === 0 ? O.none : O.some(n + 1));
+
+    const values = await pipe(
+      AI.fromIterable([E.left(1), E.right(2), E.right(3)]),
+      AIE.filterMapTask(f),
+      AI.toArraySeq()
+    )();
+    expect(values).toStrictEqual([E.left(1), E.right(4)]);
+  });
+
+  test("filterMapTaskEitherWithIndex", async () => {
+    const f = (i: number, n: number) =>
+      TE.of((i + n) % 2 === 0 ? O.none : O.some(n + 1));
+
+    const values = await pipe(
+      AIE.fromIterable([1, 2, 4]),
+      AIE.filterMapTaskEitherWithIndex(f),
+      AIE.toArraySeq()
+    )();
+    expect(values).toStrictEqual(E.right([2, 3]));
+  });
+
+  test("filterMapTaskEither", async () => {
+    const f = (n: number): TE.TaskEither<string, O.Option<number>> =>
+      T.of(
+        n === 1 ? E.left("1") : E.right(n % 2 === 0 ? O.none : O.some(n + 1))
+      );
+
+    // const f = (n: number) => TE.of(n % 2 === 0 ? O.none : O.some(n + 1));
+
+    const values = await pipe(
+      AI.fromIterable([E.left("1"), E.right(2), E.right(3)]),
+      AIE.filterMapTaskEither(f),
+      AI.toArraySeq()
+    )();
+    expect(values).toStrictEqual([E.left("1"), E.right(4)]);
+  });
+
   test("ap", () => {
     const test = pipe(
       AIE.of((n: number) => n * 2),

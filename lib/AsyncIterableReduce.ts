@@ -1,8 +1,8 @@
 /**
  * @since 1.0.0
  */
-import * as O from "fp-ts/Option";
-import * as T from "fp-ts/Task";
+import * as O from "fp-ts/lib/Option";
+import * as T from "fp-ts/lib/Task";
 
 /**
  * @category sequencing
