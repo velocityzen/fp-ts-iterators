@@ -329,7 +329,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Do: AsyncIterable<{}>
+export declare const Do: AsyncIterable<object>
 ```
 
 Added in v1.0.0

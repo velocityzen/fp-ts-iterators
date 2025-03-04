@@ -70,6 +70,21 @@ Added in v1.0.0
   - [tapErrorIO](#taperrorio)
   - [tapErrorTask](#taperrortask)
   - [tapErrorTaskEither](#taperrortaskeither)
+- [filtering](#filtering)
+  - [PredicateTaskEither (interface)](#predicatetaskeither-interface)
+  - [PredicateTaskEitherWithIndex (interface)](#predicatetaskeitherwithindex-interface)
+  - [filter](#filter)
+  - [filterMap](#filtermap)
+  - [filterMapTask](#filtermaptask)
+  - [filterMapTaskEither](#filtermaptaskeither)
+  - [filterMapTaskEitherWithIndex](#filtermaptaskeitherwithindex)
+  - [filterMapTaskWithIndex](#filtermaptaskwithindex)
+  - [filterMapWithIndex](#filtermapwithindex)
+  - [filterTask](#filtertask)
+  - [filterTaskEither](#filtertaskeither)
+  - [filterTaskEitherWithIndex](#filtertaskeitherwithindex)
+  - [filterTaskWithIndex](#filtertaskwithindex)
+  - [filterWithIndex](#filterwithindex)
 - [folding](#folding)
   - [toArrayLimited](#toarraylimited)
   - [toArrayPar](#toarraypar)
@@ -676,6 +691,204 @@ Added in v1.0.0
 export declare const tapErrorTaskEither: <E1, E2, B>(
   onLeft: (e: E1) => TE.TaskEither<E2, B>
 ) => <A>(ma: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A>
+```
+
+Added in v1.0.0
+
+# filtering
+
+## PredicateTaskEither (interface)
+
+**Signature**
+
+```ts
+export interface PredicateTaskEither<E, A> {
+  (a: A): TE.TaskEither<E, boolean>
+}
+```
+
+Added in v1.0.0
+
+## PredicateTaskEitherWithIndex (interface)
+
+**Signature**
+
+```ts
+export interface PredicateTaskEitherWithIndex<I, E, A> {
+  (i: I, a: A): TE.TaskEither<E, boolean>
+}
+```
+
+Added in v1.0.0
+
+## filter
+
+**Signature**
+
+```ts
+export declare const filter: {
+  <E, A, B extends A>(refinement: Refinement<A, B>): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+  <E, A>(predicate: Predicate<A>): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>
+  <E, A>(predicate: Predicate<A>): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## filterMap
+
+**Signature**
+
+```ts
+export declare const filterMap: <E, A, B>(
+  f: (a: A) => O.Option<B>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterMapTask
+
+**Signature**
+
+```ts
+export declare const filterMapTask: <E, A, B>(
+  f: (a: A) => T.Task<O.Option<B>>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterMapTaskEither
+
+**Signature**
+
+```ts
+export declare const filterMapTaskEither: <E, A, B>(
+  f: (a: A) => TE.TaskEither<E, O.Option<B>>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterMapTaskEitherWithIndex
+
+**Signature**
+
+```ts
+export declare const filterMapTaskEitherWithIndex: <E, A, B>(
+  f: (i: number, a: A) => TE.TaskEither<E, O.Option<B>>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterMapTaskWithIndex
+
+**Signature**
+
+```ts
+export declare const filterMapTaskWithIndex: <E, A, B>(
+  f: (i: number, a: A) => T.Task<O.Option<B>>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterMapWithIndex
+
+Same as [`filter`](#filter), but passing also the index to the iterating function.
+
+**Signature**
+
+```ts
+export declare const filterMapWithIndex: <E, A, B>(
+  f: (i: number, a: A) => O.Option<B>
+) => (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+```
+
+Added in v1.0.0
+
+## filterTask
+
+**Signature**
+
+```ts
+export declare const filterTask: {
+  <E, A>(predicate: AI.PredicateTask<A>): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>
+  <E, A>(predicate: AI.PredicateTask<A>): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## filterTaskEither
+
+**Signature**
+
+```ts
+export declare const filterTaskEither: {
+  <E, A>(predicate: PredicateTaskEither<E, A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>
+  <E, A>(predicate: PredicateTaskEither<E, A>): (fa: AsyncIterableEither<E, A>) => AsyncIterable<A>
+}
+```
+
+Added in v1.0.0
+
+## filterTaskEitherWithIndex
+
+**Signature**
+
+```ts
+export declare const filterTaskEitherWithIndex: {
+  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>
+  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## filterTaskWithIndex
+
+**Signature**
+
+```ts
+export declare const filterTaskWithIndex: {
+  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): <B extends A>(
+    fb: AsyncIterableEither<E, B>
+  ) => AsyncIterableEither<E, B>
+  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>
+}
+```
+
+Added in v1.0.0
+
+## filterWithIndex
+
+Same as [`filter`](#filter), but passing also the index to the iterating function.
+
+**Signature**
+
+```ts
+export declare const filterWithIndex: {
+  <E, A, B extends A>(refinementWithIndex: RefinementWithIndex<number, A, B>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, B>
+  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): <B extends A>(
+    fb: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, B>
+  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): (
+    fa: AsyncIterableEither<E, A>
+  ) => AsyncIterableEither<E, A>
+}
 ```
 
 Added in v1.0.0

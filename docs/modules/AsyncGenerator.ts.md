@@ -51,7 +51,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function fromLazyArg<A, R, N>(f: () => A): AsyncGenerator<A, R, N>
+export declare function fromLazyArg<A>(f: () => A): AsyncGenerator<A>
 ```
 
 Added in v1.0.0
