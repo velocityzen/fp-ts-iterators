@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { setTimeout } from "node:timers/promises";
 
 export function createTestAsyncIterable(delay?: (i: number) => number) {

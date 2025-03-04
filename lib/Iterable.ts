@@ -7,6 +7,12 @@
  *
  * @since 1.0.0
  */
+
+// for some reason eslint does not see type of values from iterable
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import { Applicative1 } from "fp-ts/Applicative";
 import {
   Apply1,

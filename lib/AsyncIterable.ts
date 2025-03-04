@@ -314,7 +314,7 @@ export const ap =
   <A>(fa: AsyncIterable<A>) =>
   <B>(fab: AsyncIterable<(a: A) => B>): AsyncIterable<B> => {
     const fabTask = pipe(fab, toArraySeq());
-    let fabs: Array<(a: A) => B>;
+    let fabs: undefined | Array<(a: A) => B>;
     let i = 0;
     let a: A;
     let justStarted = true;
@@ -346,7 +346,7 @@ export const apTask =
   <A>(fa: AsyncIterable<A>) =>
   <B>(fab: AsyncIterable<(a: A) => Task<B>>): AsyncIterable<B> => {
     const fabTask = pipe(fab, toArraySeq());
-    let fabs: Array<(a: A) => Task<B>>;
+    let fabs: undefined | Array<(a: A) => Task<B>>;
     let i = 0;
     let a: A;
     let justStarted = true;
@@ -904,7 +904,7 @@ export const tapIO: {
  * @category do notation
  * @since 1.0.0
  */
-export const Do: AsyncIterable<{}> = /*#__PURE__*/ of({});
+export const Do: AsyncIterable<object> = /*#__PURE__*/ of({});
 
 /**
  * @category do notation

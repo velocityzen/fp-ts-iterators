@@ -2,7 +2,8 @@
   "compilerOptions": {
     "noEmit": true,
     "allowJs": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "strictNullChecks": true
   },
   "include": ["./lib/**/*.ts", "./tests/**/*.ts"]
 }

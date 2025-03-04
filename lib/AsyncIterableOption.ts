@@ -288,6 +288,7 @@ export const match: <B, A>(
 export const matchW: <B, A, C>(
   onNone: () => B,
   onSome: (a: A) => C
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (ma: AsyncIterableOption<A>) => AsyncIterable<B | C> = match as any;
 
 /**
@@ -315,6 +316,7 @@ export function matchE<A, B>(
 export const matchEW: <B, C, A>(
   onNone: () => Task<B>,
   onSome: (a: A) => Task<C>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (fa: AsyncIterableOption<A>) => AsyncIterable<B | C> = matchE as any;
 
 /**
@@ -338,6 +340,7 @@ export function getOrElse<A>(
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const getOrElseW: <B>(
   onNone: LazyArg<B>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => <A>(ma: AsyncIterableOption<A>) => AsyncIterable<A | B> = getOrElse as any;
 
 /**
@@ -358,7 +361,7 @@ export function tryCatch<A>(fa: AsyncIterable<A>): AsyncIterableOption<A> {
         for await (const a of fa) {
           yield O.some(a);
         }
-      } catch (e) {
+      } catch (_e: unknown) {
         yield O.none;
       }
     },

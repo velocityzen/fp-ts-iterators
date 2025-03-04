@@ -98,11 +98,6 @@
       }
     ]
   },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
   "include": ["./lib/**/*"],
   "exclude": ["./node_modules"]
 }

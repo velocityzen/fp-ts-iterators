@@ -1,15 +1,14 @@
-import * as T from "fp-ts/Task";
-import * as O from "fp-ts/Option";
+import * as B from "fp-ts/boolean";
 import * as E from "fp-ts/Either";
 import * as N from "fp-ts/number";
-import * as B from "fp-ts/boolean";
+import * as O from "fp-ts/Option";
 import * as S from "fp-ts/string";
+import * as T from "fp-ts/Task";
 // import * as C from "fp-ts/console";
-import { identity, pipe } from "fp-ts/function";
 import { Eq, contramap } from "fp-ts/Eq";
-
+import { identity, pipe } from "fp-ts/function";
+import { describe, expect, test } from "vitest";
 import * as AI from "../lib/AsyncIterable";
-
 import {
   createTestAsyncIterable,
   createTestAsyncIterableWithError,
@@ -471,7 +470,9 @@ describe("AsyncIterable", () => {
       AI.fromIterable([1, 2, 3]),
       AI.tap((a) => AI.of(a * 2)),
       AI.toArraySeq(),
-      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+      T.map((value) => {
+        expect(value).toStrictEqual([1, 2, 3]);
+      })
     );
 
     return test;
@@ -485,7 +486,9 @@ describe("AsyncIterable", () => {
       AI.fromIterable([1, 2, 3]),
       AI.tapIO(add),
       AI.toArraySeq(),
-      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+      T.map((value) => {
+        expect(value).toStrictEqual([1, 2, 3]);
+      })
     )();
 
     expect(ref).toStrictEqual([1, 2, 3]);
@@ -499,7 +502,9 @@ describe("AsyncIterable", () => {
       AI.fromIterable([1, 2, 3]),
       AI.tapTask(add),
       AI.toArraySeq(),
-      T.map((value) => expect(value).toStrictEqual([1, 2, 3]))
+      T.map((value) => {
+        expect(value).toStrictEqual([1, 2, 3]);
+      })
     )();
 
     expect(ref).toStrictEqual([1, 2, 3]);

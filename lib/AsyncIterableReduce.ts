@@ -59,7 +59,7 @@ export function reduceUntilWithIndexLimited<A, B>(
         running++;
         next()
           .then(didRun)
-          .catch((cause) => {
+          .catch((cause: unknown) => {
             isDone = true;
 
             reject(

@@ -13,7 +13,7 @@ import * as G from "./Generator";
  * @category conversions
  * @since 1.0.0
  */
-export function fromLazyArg<A, R, N>(f: () => A): AsyncGenerator<A, R, N> {
+export function fromLazyArg<A>(f: () => A): AsyncGenerator<A> {
   async function* next(): AsyncGenerator<A> {
     const res = f();
     yield res;

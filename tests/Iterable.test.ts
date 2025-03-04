@@ -1,11 +1,11 @@
-import * as O from "fp-ts/Option";
-import * as E from "fp-ts/Either";
-import * as N from "fp-ts/number";
 import * as B from "fp-ts/boolean";
-import * as S from "fp-ts/string";
-import { identity, pipe } from "fp-ts/function";
+import * as E from "fp-ts/Either";
 import { Eq, contramap } from "fp-ts/Eq";
-
+import { identity, pipe } from "fp-ts/function";
+import * as N from "fp-ts/number";
+import * as O from "fp-ts/Option";
+import * as S from "fp-ts/string";
+import { describe, expect, test } from "vitest";
 import * as I from "../lib/Iterable";
 
 describe("Iterable", () => {

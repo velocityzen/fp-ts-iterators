@@ -290,6 +290,7 @@ export const match: <E, B, A>(
 export const matchW: <E, B, A, C>(
   onLeft: (e: E) => B,
   onRight: (a: A) => C
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (ma: AsyncIterableEither<E, A>) => AsyncIterable<B | C> = match as any;
 
 /**
@@ -317,6 +318,7 @@ export function matchE<E, A, B>(
 export const matchEW: <E, B, A, C>(
   onLeft: (e: E) => T.Task<B>,
   onRight: (a: A) => T.Task<C>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (ma: AsyncIterableEither<E, A>) => AsyncIterable<B | C> = matchE as any;
 
 /**
@@ -342,6 +344,7 @@ export function getOrElse<E, A>(
 export const getOrElseW: <E, B>(
   onLeft: (e: E) => B
 ) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterable<A | B> =
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getOrElse as any;
 
 /**
@@ -466,6 +469,7 @@ export const apW: <E2, A>(
   fa: AsyncIterableEither<E2, A>
 ) => <E1, B>(
   fab: AsyncIterableEither<E1, (a: A) => B>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => AsyncIterableEither<E1 | E2, B> = ap as any;
 
 /**
