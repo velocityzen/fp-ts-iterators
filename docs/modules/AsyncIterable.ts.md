@@ -96,6 +96,7 @@ Added in v1.0.0
   - [flatMapTask](#flatmaptask)
   - [flatMapTaskWithIndex](#flatmaptaskwithindex)
   - [flatten](#flatten)
+  - [flattenIterable](#flatteniterable)
 - [type lambdas](#type-lambdas)
   - [URI](#uri)
   - [URI (type alias)](#uri-type-alias)
@@ -900,6 +901,16 @@ Added in v1.0.0
 
 ```ts
 export declare const flatten: <A>(mma: AsyncIterable<AsyncIterable<A>>) => AsyncIterable<A>
+```
+
+Added in v1.0.0
+
+## flattenIterable
+
+**Signature**
+
+```ts
+export declare const flattenIterable: <A>(mma: AsyncIterable<Iterable<A>>) => AsyncIterable<A>
 ```
 
 Added in v1.0.0

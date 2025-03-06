@@ -122,7 +122,7 @@ export const right: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
  * @since 1.0.0
  */
 export const rightIterable: <E = never, A = never>(
-  ma: Iterable<A>
+  ma: Iterable<A>,
 ) => AsyncIterableEither<E, A> = (ma) =>
   AI.fromIterable(pipe(ma, I.map(E.right)));
 
@@ -131,7 +131,7 @@ export const rightIterable: <E = never, A = never>(
  * @since 1.0.0
  */
 export const leftIterable: <E = never, A = never>(
-  ma: Iterable<E>
+  ma: Iterable<E>,
 ) => AsyncIterableEither<E, A> = (ma) =>
   AI.fromIterable(pipe(ma, I.map(E.left)));
 
@@ -140,7 +140,7 @@ export const leftIterable: <E = never, A = never>(
  * @since 1.0.0
  */
 export const rightTask: <E = never, A = never>(
-  ma: T.Task<A>
+  ma: T.Task<A>,
 ) => AsyncIterableEither<E, A> = (ma) => AI.fromTask(pipe(ma, T.map(E.right)));
 
 /**
@@ -148,7 +148,7 @@ export const rightTask: <E = never, A = never>(
  * @since 1.0.0
  */
 export const leftTask: <E = never, A = never>(
-  me: T.Task<E>
+  me: T.Task<E>,
 ) => AsyncIterableEither<E, A> = (ma) => AI.fromTask(pipe(ma, T.map(E.left)));
 
 /**
@@ -163,7 +163,7 @@ export const of: <E = never, A = never>(a: A) => AsyncIterableEither<E, A> =
  * @since 1.0.0
  */
 export const rightAsyncIterable: <E = never, A = never>(
-  ma: AsyncIterable<A>
+  ma: AsyncIterable<A>,
 ) => AsyncIterableEither<E, A> = ET.rightF(AI.Functor);
 
 /**
@@ -171,7 +171,7 @@ export const rightAsyncIterable: <E = never, A = never>(
  * @since 1.0.0
  */
 export const leftAsyncIterable: <E = never, A = never>(
-  me: AsyncIterable<E>
+  me: AsyncIterable<E>,
 ) => AsyncIterableEither<E, A> = ET.leftF(AI.Functor);
 
 /**
@@ -179,7 +179,7 @@ export const leftAsyncIterable: <E = never, A = never>(
  * @since 1.0.0
  */
 export const rightIO: <E = never, A = never>(
-  ma: IO<A>
+  ma: IO<A>,
 ) => AsyncIterableEither<E, A> = flow(AI.fromIO, rightAsyncIterable);
 
 /**
@@ -187,7 +187,7 @@ export const rightIO: <E = never, A = never>(
  * @since 1.0.0
  */
 export const leftIO: <E = never, A = never>(
-  me: IO<E>
+  me: IO<E>,
 ) => AsyncIterableEither<E, A> = flow(AI.fromIO, leftAsyncIterable);
 
 // -------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ export const fromTask: <E, A>(fa: T.Task<A>) => AsyncIterableEither<E, A> =
  * @since 1.0.0
  */
 export const fromTaskEither: <E, A>(
-  fa: TE.TaskEither<E, A>
+  fa: TE.TaskEither<E, A>,
 ) => AsyncIterableEither<E, A> = AI.fromTask;
 
 /**
@@ -221,7 +221,7 @@ export const fromTaskEither: <E, A>(
  * @since 1.0.0
  */
 export const fromTaskEitherK = <E, A extends ReadonlyArray<unknown>, B>(
-  f: (...a: A) => TE.TaskEither<E, B>
+  f: (...a: A) => TE.TaskEither<E, B>,
 ): ((...a: A) => AsyncIterableEither<E, B>) => flow(f, fromTaskEither);
 
 /**
@@ -238,7 +238,7 @@ export const fromTaskOption =
  * @since 1.0.0
  */
 export const fromIterable: <A, E = never>(
-  fa: Iterable<A>
+  fa: Iterable<A>,
 ) => AsyncIterableEither<E, A> = rightIterable;
 
 /**
@@ -246,7 +246,7 @@ export const fromIterable: <A, E = never>(
  * @since 1.0.0
  */
 export const fromAsyncIterable: <A, E = never>(
-  fa: AsyncIterable<A>
+  fa: AsyncIterable<A>,
 ) => AsyncIterableEither<E, A> = rightAsyncIterable;
 
 /**
@@ -261,7 +261,7 @@ export const fromEither: <E, A>(fa: Either<E, A>) => AsyncIterableEither<E, A> =
  * @since 1.0.0
  */
 export const fromIOEither: <E, A>(
-  fa: IOEither<E, A>
+  fa: IOEither<E, A>,
 ) => AsyncIterableEither<E, A> = AI.fromIO;
 
 /**
@@ -269,7 +269,7 @@ export const fromIOEither: <E, A>(
  * @since 1.0.0
  */
 export const fromAsyncIterableOption: <E>(
-  onNone: LazyArg<E>
+  onNone: LazyArg<E>,
 ) => <A>(fa: AsyncIterableOption<A>) => AsyncIterableEither<E, A> = (onNone) =>
   AI.map(E.fromOption(onNone));
 
@@ -279,7 +279,7 @@ export const fromAsyncIterableOption: <E>(
  */
 export const match: <E, B, A>(
   onLeft: (e: E) => B,
-  onRight: (a: A) => B
+  onRight: (a: A) => B,
 ) => (ma: AsyncIterableEither<E, A>) => AsyncIterable<B> = ET.match(AI.Functor);
 
 /**
@@ -293,7 +293,7 @@ export const match: <E, B, A>(
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchW: <E, B, A, C>(
   onLeft: (e: E) => B,
-  onRight: (a: A) => C
+  onRight: (a: A) => C,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (ma: AsyncIterableEither<E, A>) => AsyncIterable<B | C> = match as any;
 
@@ -305,7 +305,7 @@ export const matchW: <E, B, A, C>(
  */
 export function matchE<E, A, B>(
   onLeft: (e: E) => T.Task<B>,
-  onRight: (a: A) => T.Task<B>
+  onRight: (a: A) => T.Task<B>,
 ) {
   return AI.flatMapTask<Either<E, A>, B>(E.match(onLeft, onRight));
 }
@@ -321,7 +321,7 @@ export function matchE<E, A, B>(
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const matchEW: <E, B, A, C>(
   onLeft: (e: E) => T.Task<B>,
-  onRight: (a: A) => T.Task<C>
+  onRight: (a: A) => T.Task<C>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => (ma: AsyncIterableEither<E, A>) => AsyncIterable<B | C> = matchE as any;
 
@@ -330,7 +330,7 @@ export const matchEW: <E, B, A, C>(
  * @since 1.0.0
  */
 export function getOrElse<E, A>(
-  onLeft: (e: E) => A
+  onLeft: (e: E) => A,
 ): (ma: AsyncIterableEither<E, A>) => AsyncIterable<A> {
   return match(onLeft, identity);
   // return AI.map(E.match(onLeft, identity));
@@ -346,7 +346,7 @@ export function getOrElse<E, A>(
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const getOrElseW: <E, B>(
-  onLeft: (e: E) => B
+  onLeft: (e: E) => B,
 ) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterable<A | B> =
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getOrElse as any;
@@ -383,7 +383,7 @@ export function tryCatchToError<A>() {
  * @since 1.0.0
  */
 export const toUnion: <E, A>(
-  fa: AsyncIterableEither<E, A>
+  fa: AsyncIterableEither<E, A>,
 ) => AsyncIterable<E | A> = ET.toUnion(AI.Functor);
 
 /**
@@ -391,16 +391,16 @@ export const toUnion: <E, A>(
  * @since 1.0.0
  */
 export const fromNullable: <E>(
-  e: E
+  e: E,
 ) => <A>(a: A) => AsyncIterableEither<E, NonNullable<A>> = ET.fromNullable(
-  AI.Pointed
+  AI.Pointed,
 );
 
 /**
  * @since 1.0.0
  */
 export const swap: <E, A>(
-  ma: AsyncIterableEither<E, A>
+  ma: AsyncIterableEither<E, A>,
 ) => AsyncIterableEither<A, E> = ET.swap(AI.Functor);
 
 /**
@@ -411,9 +411,9 @@ export const swap: <E, A>(
  * @since 1.0.0
  */
 export const map: <A, B>(
-  f: (a: A) => B
+  f: (a: A) => B,
 ) => <E>(fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B> = ET.map(
-  AI.Functor
+  AI.Functor,
 );
 
 /**
@@ -423,14 +423,15 @@ export const map: <A, B>(
  * @since 1.0.0
  */
 export const mapBoth: {
-  <E, G, A, B>(f: (e: E) => G, g: (a: A) => B): (
-    self: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<G, B>;
+  <E, G, A, B>(
+    f: (e: E) => G,
+    g: (a: A) => B,
+  ): (self: AsyncIterableEither<E, A>) => AsyncIterableEither<G, B>;
 
   <E, A, G, B>(
     self: AsyncIterableEither<E, A>,
     f: (e: E) => G,
-    g: (a: A) => B
+    g: (a: A) => B,
   ): AsyncIterableEither<G, B>;
 } = dual(3, mapBoth_(AI.Functor));
 
@@ -441,12 +442,12 @@ export const mapBoth: {
  * @since 1.0.0
  */
 export const mapError: {
-  <E, G>(f: (e: E) => G): <A>(
-    self: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<G, A>;
+  <E, G>(
+    f: (e: E) => G,
+  ): <A>(self: AsyncIterableEither<E, A>) => AsyncIterableEither<G, A>;
   <E, A, G>(
     self: AsyncIterableEither<E, A>,
-    f: (e: E) => G
+    f: (e: E) => G,
   ): AsyncIterableEither<G, A>;
 } = dual(2, mapError_(AI.Functor));
 
@@ -455,9 +456,9 @@ export const mapError: {
  * @since 1.0.0
  */
 export const ap: <E, A>(
-  fa: AsyncIterableEither<E, A>
+  fa: AsyncIterableEither<E, A>,
 ) => <B>(
-  fab: AsyncIterableEither<E, (a: A) => B>
+  fab: AsyncIterableEither<E, (a: A) => B>,
 ) => AsyncIterableEither<E, B> = ET.ap(AI.Apply);
 
 /**
@@ -470,9 +471,9 @@ export const ap: <E, A>(
  */
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
 export const apW: <E2, A>(
-  fa: AsyncIterableEither<E2, A>
+  fa: AsyncIterableEither<E2, A>,
 ) => <E1, B>(
-  fab: AsyncIterableEither<E1, (a: A) => B>
+  fab: AsyncIterableEither<E1, (a: A) => B>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => AsyncIterableEither<E1 | E2, B> = ap as any;
 
@@ -481,14 +482,28 @@ export const apW: <E2, A>(
  * @since 1.0.0
  */
 export const flatMap: {
-  <A, E2, B>(f: (a: A) => AsyncIterableEither<E2, B>): <E1>(
-    ma: AsyncIterableEither<E1, A>
-  ) => AsyncIterableEither<E1 | E2, B>;
+  <A, E2, B>(
+    f: (a: A) => AsyncIterableEither<E2, B>,
+  ): <E1>(ma: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, B>;
   <E1, A, E2, B>(
     ma: AsyncIterableEither<E1, A>,
-    f: (a: A) => AsyncIterableEither<E2, B>
+    f: (a: A) => AsyncIterableEither<E2, B>,
   ): AsyncIterableEither<E1 | E2, B>;
 } = dual(2, flatMap_(AI.Monad));
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export const flatMapIterable: {
+  <A, B>(
+    f: (a: A) => Iterable<B>,
+  ): <E>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>;
+  <E, A, B>(
+    ma: AsyncIterableEither<E, A>,
+    f: (a: A) => Iterable<B>,
+  ): AsyncIterableEither<E, B>;
+} = dual(2, flatMap_(I.Monad));
 
 /**
  * @category sequencing
@@ -559,7 +574,7 @@ export const flatMapTaskOption =
           a,
           TO.fromEither,
           TO.flatMap(f),
-          TE.fromTaskOption(onNone)
+          TE.fromTaskOption(onNone),
         )();
       }
     },
@@ -587,9 +602,9 @@ export const Functor: Functor2<URI> = {
  * @since 1.0.0
  */
 export const as: {
-  <A>(a: A): <E, _>(
-    self: AsyncIterableEither<E, _>
-  ) => AsyncIterableEither<E, A>;
+  <A>(
+    a: A,
+  ): <E, _>(self: AsyncIterableEither<E, _>) => AsyncIterableEither<E, A>;
   <E, _, A>(self: AsyncIterableEither<E, _>, a: A): AsyncIterableEither<E, A>;
 } = dual(2, as_(Functor));
 
@@ -600,7 +615,7 @@ export const as: {
  * @since 1.0.0
  */
 export const asUnit: <E, _>(
-  self: AsyncIterableEither<E, _>
+  self: AsyncIterableEither<E, _>,
 ) => AsyncIterableEither<E, void> = asUnit_(Functor);
 
 /**
@@ -662,7 +677,7 @@ export const FromIO: FromIO2<URI> = {
  * @since 1.0.0
  */
 export const fromIOK: <A extends ReadonlyArray<unknown>, B>(
-  f: (...a: A) => IO<B>
+  f: (...a: A) => IO<B>,
 ) => <E = never>(...a: A) => AsyncIterableEither<E, B> = fromIOK_(FromIO);
 
 /**
@@ -680,7 +695,7 @@ export const FromTask: FromTask2<URI> = {
  * @since 1.0.0
  */
 export const fromTaskK: <A extends ReadonlyArray<unknown>, B>(
-  f: (...a: A) => T.Task<B>
+  f: (...a: A) => T.Task<B>,
 ) => <E = never>(...a: A) => AsyncIterableEither<E, B> = fromTaskK_(FromTask);
 
 /**
@@ -697,7 +712,7 @@ export const FromEither: FromEither2<URI> = {
  * @since 1.0.0
  */
 export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
-  f: (...a: A) => E.Either<E, B>
+  f: (...a: A) => E.Either<E, B>,
 ) => (...a: A) => AsyncIterableEither<E, B> = fromEitherK_(FromEither);
 
 /**
@@ -705,7 +720,7 @@ export const fromEitherK: <E, A extends ReadonlyArray<unknown>, B>(
  * @since 1.0.0
  */
 export const fromOption: <E>(
-  onNone: LazyArg<E>
+  onNone: LazyArg<E>,
 ) => <A>(fa: O.Option<A>) => AsyncIterableEither<E, A> =
   fromOption_(FromEither);
 
@@ -714,9 +729,9 @@ export const fromOption: <E>(
  * @since 1.0.0
  */
 export const fromOptionK: <E>(
-  onNone: LazyArg<E>
+  onNone: LazyArg<E>,
 ) => <A extends ReadonlyArray<unknown>, B>(
-  f: (...a: A) => O.Option<B>
+  f: (...a: A) => O.Option<B>,
 ) => (...a: A) => AsyncIterableEither<E, B> = fromOptionK_(FromEither);
 
 /**
@@ -724,15 +739,18 @@ export const fromOptionK: <E>(
  * @since 1.0.0
  */
 export const fromPredicate: {
-  <E, A, B extends A>(refinement: Refinement<A, B>, onFalse: (a: A) => E): (
-    a: A
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): <B extends A>(
-    b: B
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: Predicate<A>, onFalse: (a: A) => E): (
-    a: A
-  ) => AsyncIterableEither<E, A>;
+  <E, A, B extends A>(
+    refinement: Refinement<A, B>,
+    onFalse: (a: A) => E,
+  ): (a: A) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: Predicate<A>,
+    onFalse: (a: A) => E,
+  ): <B extends A>(b: B) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: Predicate<A>,
+    onFalse: (a: A) => E,
+  ): (a: A) => AsyncIterableEither<E, A>;
 } = fromPredicate_(FromEither);
 
 /**
@@ -786,15 +804,15 @@ export const MonadTask: MonadTask2<URI> = {
  * @since 1.0.0
  */
 export const filterWithIndex: {
-  <E, A, B extends A>(refinementWithIndex: RefinementWithIndex<number, A, B>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): <B extends A>(
-    fb: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicateWithIndex: PredicateWithIndex<number, A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <E, A, B extends A>(
+    refinementWithIndex: RefinementWithIndex<number, A, B>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
 } = <E, A>(predicateWithIndex: PredicateWithIndex<number, A>) =>
   AI.filterWithIndex((i, a: E.Either<E, A>) => {
     if (E.isLeft(a)) {
@@ -809,15 +827,15 @@ export const filterWithIndex: {
  * @since 1.0.0
  */
 export const filter: {
-  <E, A, B extends A>(refinement: Refinement<A, B>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: Predicate<A>): <B extends A>(
-    fb: AsyncIterableEither<E, B>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: Predicate<A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <E, A, B extends A>(
+    refinement: Refinement<A, B>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: Predicate<A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: Predicate<A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
 } = <E, A>(predicate: Predicate<A>) =>
   filterWithIndex<E, A>((_, a) => predicate(a));
 
@@ -826,14 +844,12 @@ export const filter: {
  * @since 1.0.0
  */
 export const filterTaskWithIndex: {
-  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): <
-    B extends A
-  >(
-    fb: AsyncIterableEither<E, B>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <E, A>(
+    predicateWithIndex: AI.PredicateTaskWithIndex<number, A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicateWithIndex: AI.PredicateTaskWithIndex<number, A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
   /* eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters */
 } = <E, A>(predicateWithIndex: AI.PredicateTaskWithIndex<number, A>) =>
   AI.filterTaskWithIndex<E.Either<E, A>>((i, a) => {
@@ -849,12 +865,12 @@ export const filterTaskWithIndex: {
  * @since 1.0.0
  */
 export const filterTask: {
-  <E, A>(predicate: AI.PredicateTask<A>): <B extends A>(
-    fb: AsyncIterableEither<E, B>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: AI.PredicateTask<A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <E, A>(
+    predicate: AI.PredicateTask<A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: AI.PredicateTask<A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
 } = <E, A>(predicate: AI.PredicateTask<A>) =>
   filterTaskWithIndex<E, A>((_, a) => predicate(a));
 
@@ -871,14 +887,12 @@ export interface PredicateTaskEitherWithIndex<I, E, A> {
  * @since 1.0.0
  */
 export const filterTaskEitherWithIndex: {
-  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): <
-    B extends A
-  >(
-    fb: AsyncIterableEither<E, B>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <E, A>(
+    predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
 } =
   <E, A>(predicateWithIndex: PredicateTaskEitherWithIndex<number, E, A>) =>
   (fa: AsyncIterableEither<E, A>) => {
@@ -917,12 +931,12 @@ export interface PredicateTaskEither<E, A> {
  * @since 1.0.0
  */
 export const filterTaskEither: {
-  <E, A>(predicate: PredicateTaskEither<E, A>): <B extends A>(
-    fb: AsyncIterableEither<E, B>
-  ) => AsyncIterableEither<E, B>;
-  <E, A>(predicate: PredicateTaskEither<E, A>): (
-    fa: AsyncIterableEither<E, A>
-  ) => AsyncIterable<A>;
+  <E, A>(
+    predicate: PredicateTaskEither<E, A>,
+  ): <B extends A>(fb: AsyncIterableEither<E, B>) => AsyncIterableEither<E, B>;
+  <E, A>(
+    predicate: PredicateTaskEither<E, A>,
+  ): (fa: AsyncIterableEither<E, A>) => AsyncIterable<A>;
 } = <E, A>(predicate: PredicateTaskEither<E, A>) =>
   filterTaskEitherWithIndex<E, A>((_, a) => predicate(a));
 
@@ -1031,7 +1045,7 @@ export const filterMapTaskEitherWithIndex =
  * @since 1.0.0
  */
 export const filterMapTaskEither = <E, A, B>(
-  f: (a: A) => TE.TaskEither<E, O.Option<B>>
+  f: (a: A) => TE.TaskEither<E, O.Option<B>>,
 ) => filterMapTaskEitherWithIndex<E, A, B>((_, a) => f(a));
 
 /**
@@ -1044,11 +1058,11 @@ export const filterMapTaskEither = <E, A, B>(
 export const tap: {
   <E1, A, E2, _>(
     self: AsyncIterableEither<E1, A>,
-    f: (a: A) => AsyncIterableEither<E2, _>
+    f: (a: A) => AsyncIterableEither<E2, _>,
   ): AsyncIterableEither<E1 | E2, A>;
-  <A, E2, _>(f: (a: A) => AsyncIterableEither<E2, _>): <E1>(
-    self: AsyncIterableEither<E1, A>
-  ) => AsyncIterableEither<E2 | E1, A>;
+  <A, E2, _>(
+    f: (a: A) => AsyncIterableEither<E2, _>,
+  ): <E1>(self: AsyncIterableEither<E1, A>) => AsyncIterableEither<E2 | E1, A>;
 } = dual(2, tap_(Chain));
 
 /**
@@ -1056,12 +1070,12 @@ export const tap: {
  * @since 1.0.0
  */
 export const tapTask: {
-  <A, _>(f: (a: A) => T.Task<_>): <E>(
-    self: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <A, _>(
+    f: (a: A) => T.Task<_>,
+  ): <E>(self: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
   <E, A, _>(
     self: AsyncIterableEither<E, A>,
-    f: (a: A) => T.Task<_>
+    f: (a: A) => T.Task<_>,
   ): AsyncIterableEither<E, A>;
 } = dual(2, tapTask_(FromTask, Chain));
 
@@ -1070,19 +1084,19 @@ export const tapTask: {
  * @since 1.0.0
  */
 export const tapTaskEither: {
-  <A, E2, _>(f: (a: A) => TE.TaskEither<E2, _>): <E1>(
-    self: AsyncIterableEither<E1, A>
-  ) => AsyncIterableEither<E1 | E2, A>;
+  <A, E2, _>(
+    f: (a: A) => TE.TaskEither<E2, _>,
+  ): <E1>(self: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A>;
   <E1, A, E2, _>(
     self: AsyncIterableEither<E1, A>,
-    f: (a: A) => TE.TaskEither<E2, _>
+    f: (a: A) => TE.TaskEither<E2, _>,
   ): AsyncIterableEither<E1 | E2, A>;
 } = /*#__PURE__*/ dual(
   2,
   <E1, A, E2, _>(
     self: AsyncIterableEither<E1, A>,
-    f: (a: A) => TE.TaskEither<E2, _>
-  ): AsyncIterableEither<E1 | E2, A> => tap(self, fromTaskEitherK(f))
+    f: (a: A) => TE.TaskEither<E2, _>,
+  ): AsyncIterableEither<E1 | E2, A> => tap(self, fromTaskEitherK(f)),
 );
 
 /**
@@ -1090,12 +1104,12 @@ export const tapTaskEither: {
  * @since 1.0.0
  */
 export const tapIO: {
-  <A, _>(f: (a: A) => IO<_>): <E>(
-    self: AsyncIterableEither<E, A>
-  ) => AsyncIterableEither<E, A>;
+  <A, _>(
+    f: (a: A) => IO<_>,
+  ): <E>(self: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A>;
   <E, A, _>(
     self: AsyncIterableEither<E, A>,
-    f: (a: A) => IO<_>
+    f: (a: A) => IO<_>,
   ): AsyncIterableEither<E, A>;
 } = dual(2, tapIO_(FromIO, Chain));
 
@@ -1104,12 +1118,12 @@ export const tapIO: {
  * @since 1.0.0
  */
 export const tapEither: {
-  <A, E2, _>(f: (a: A) => Either<E2, _>): <E1>(
-    self: AsyncIterableEither<E1, A>
-  ) => AsyncIterableEither<E2 | E1, A>;
+  <A, E2, _>(
+    f: (a: A) => Either<E2, _>,
+  ): <E1>(self: AsyncIterableEither<E1, A>) => AsyncIterableEither<E2 | E1, A>;
   <E1, A, E2, _>(
     self: AsyncIterableEither<E1, A>,
-    f: (a: A) => Either<E2, _>
+    f: (a: A) => Either<E2, _>,
   ): AsyncIterableEither<E1 | E2, A>;
 } = dual(2, tapEither_(FromEither, Chain));
 
@@ -1120,12 +1134,12 @@ export const tapEither: {
  * @since 1.0.0
  */
 export const tapError: {
-  <E1, E2, _>(onLeft: (e: E1) => AsyncIterableEither<E2, _>): <A>(
-    self: AsyncIterableEither<E1, A>
-  ) => AsyncIterableEither<E1 | E2, A>;
+  <E1, E2, _>(
+    onLeft: (e: E1) => AsyncIterableEither<E2, _>,
+  ): <A>(self: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A>;
   <E1, A, E2, _>(
     self: AsyncIterableEither<E1, A>,
-    onLeft: (e: E1) => AsyncIterableEither<E2, _>
+    onLeft: (e: E1) => AsyncIterableEither<E2, _>,
   ): AsyncIterableEither<E1 | E2, A>;
 } = dual(2, tapError_(AI.Monad));
 
@@ -1134,9 +1148,9 @@ export const tapError: {
  * @since 1.0.0
  */
 export const tapErrorIO: <E, B>(
-  onLeft: (e: E) => IO<B>
+  onLeft: (e: E) => IO<B>,
 ) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A> = (
-  onLeft
+  onLeft,
 ) => tapError(fromIOK(onLeft));
 
 /**
@@ -1144,9 +1158,9 @@ export const tapErrorIO: <E, B>(
  * @since 1.0.0
  */
 export const tapErrorTask: <E, B>(
-  onLeft: (e: E) => T.Task<B>
+  onLeft: (e: E) => T.Task<B>,
 ) => <A>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, A> = (
-  onLeft
+  onLeft,
 ) => tapError(fromTaskK(onLeft));
 
 /**
@@ -1154,9 +1168,9 @@ export const tapErrorTask: <E, B>(
  * @since 1.0.0
  */
 export const tapErrorTaskEither: <E1, E2, B>(
-  onLeft: (e: E1) => TE.TaskEither<E2, B>
+  onLeft: (e: E1) => TE.TaskEither<E2, B>,
 ) => <A>(ma: AsyncIterableEither<E1, A>) => AsyncIterableEither<E1 | E2, A> = (
-  onLeft
+  onLeft,
 ) => tapError(fromTaskEitherK(onLeft));
 
 /**
@@ -1168,7 +1182,7 @@ export const tapErrorTaskEither: <E1, E2, B>(
  * @since 1.0.0
  */
 export const flattenW: <E1, E2, A>(
-  mma: AsyncIterableEither<E1, AsyncIterableEither<E2, A>>
+  mma: AsyncIterableEither<E1, AsyncIterableEither<E2, A>>,
 ) => AsyncIterableEither<E1 | E2, A> = flatMap(identity);
 
 /**
@@ -1176,8 +1190,16 @@ export const flattenW: <E1, E2, A>(
  * @since 1.0.0
  */
 export const flatten: <E, A>(
-  mma: AsyncIterableEither<E, AsyncIterableEither<E, A>>
+  mma: AsyncIterableEither<E, AsyncIterableEither<E, A>>,
 ) => AsyncIterableEither<E, A> = flattenW;
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export const flattenIterable: <E, A>(
+  mma: AsyncIterableEither<E, Iterable<A>>,
+) => AsyncIterableEither<E, A> = flatMapIterable(identity);
 
 // -------------------------------------------------------------------------------------
 // do notation
@@ -1236,9 +1258,9 @@ export function toIterableLimited<E, A>(limit: number) {
 
         b.right.push(a.right);
         return b;
-      }
+      },
     ),
-    TE.map(I.fromReadonlyArray)
+    TE.map(I.fromReadonlyArray),
   );
 }
 
@@ -1279,7 +1301,7 @@ export function toArrayLimited<E, A>(limit: number) {
 
       b.right[i] = a.right;
       return b;
-    }
+    },
   );
 }
 

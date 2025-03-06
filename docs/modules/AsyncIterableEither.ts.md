@@ -131,11 +131,13 @@ Added in v1.0.0
 - [sequencing](#sequencing)
   - [flatMap](#flatmap)
   - [flatMapEither](#flatmapeither)
+  - [flatMapIterable](#flatmapiterable)
   - [flatMapOption](#flatmapoption)
   - [flatMapTask](#flatmaptask)
   - [flatMapTaskEither](#flatmaptaskeither)
   - [flatMapTaskOption](#flatmaptaskoption)
   - [flatten](#flatten)
+  - [flattenIterable](#flatteniterable)
   - [flattenW](#flattenw)
 - [type lambdas](#type-lambdas)
   - [URI](#uri)
@@ -1349,6 +1351,19 @@ export declare const flatMapEither: <E1, E2, A, B>(
 
 Added in v1.0.0
 
+## flatMapIterable
+
+**Signature**
+
+```ts
+export declare const flatMapIterable: {
+  <A, B>(f: (a: A) => Iterable<B>): <E>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
+  <E, A, B>(ma: AsyncIterableEither<E, A>, f: (a: A) => Iterable<B>): AsyncIterableEither<E, B>
+}
+```
+
+Added in v1.0.0
+
 ## flatMapOption
 
 **Signature**
@@ -1407,6 +1422,16 @@ Added in v1.0.0
 export declare const flatten: <E, A>(
   mma: AsyncIterableEither<E, AsyncIterableEither<E, A>>
 ) => AsyncIterableEither<E, A>
+```
+
+Added in v1.0.0
+
+## flattenIterable
+
+**Signature**
+
+```ts
+export declare const flattenIterable: <E, A>(mma: AsyncIterableEither<E, Iterable<A>>) => AsyncIterableEither<E, A>
 ```
 
 Added in v1.0.0

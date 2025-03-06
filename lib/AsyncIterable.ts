@@ -92,7 +92,7 @@ declare module "fp-ts/lib/HKT" {
  * @since 1.0.0
  */
 export const makeByWithIndex = <A>(
-  f: (i: number) => Option<A>
+  f: (i: number) => Option<A>,
 ): AsyncIterable<A> => {
   let i = 0;
 
@@ -122,7 +122,7 @@ export const makeBy = <A>(f: () => Option<A>): AsyncIterable<A> =>
  * @since 1.0.0
  */
 export const makeByTaskWithIndex = <A>(
-  f: (i: number) => Task<Option<A>>
+  f: (i: number) => Task<Option<A>>,
 ): AsyncIterable<A> => {
   let i = 0;
 
@@ -149,7 +149,7 @@ export const makeByTask = <A>(f: () => Task<Option<A>>): AsyncIterable<A> =>
  */
 export const unfold = <A, B>(
   b: B,
-  f: (b: B) => Option<readonly [A, B]>
+  f: (b: B) => Option<readonly [A, B]>,
 ): AsyncIterable<A> => {
   let bb: B = b;
 
@@ -171,7 +171,7 @@ export const unfold = <A, B>(
  */
 export const unfoldTask = <A, B>(
   b: B,
-  f: (b: B) => Task<Option<readonly [A, B]>>
+  f: (b: B) => Task<Option<readonly [A, B]>>,
 ): AsyncIterable<A> => {
   let bb: B = b;
 
@@ -199,7 +199,7 @@ export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) =>
  * @since 1.0.0
  */
 export function fromAsyncGenerator<A, R, N>(
-  fa: LazyArg<AsyncGenerator<A, R, N>>
+  fa: LazyArg<AsyncGenerator<A, R, N>>,
 ) {
   return {
     async *[Symbol.asyncIterator]() {
@@ -503,8 +503,16 @@ export const flatMapTask = <A, B>(f: (a: A) => Task<B>) =>
  * @since 1.0.0
  */
 export const flatten: <A>(
-  mma: AsyncIterable<AsyncIterable<A>>
+  mma: AsyncIterable<AsyncIterable<A>>,
 ) => AsyncIterable<A> = /*#__PURE__*/ flatMap(identity);
+
+/**
+ * @category sequencing
+ * @since 1.0.0
+ */
+export const flattenIterable: <A>(
+  mma: AsyncIterable<Iterable<A>>,
+) => AsyncIterable<A> = /*#__PURE__*/ flatMapIterable(identity);
 
 /**
  * @category instances
@@ -568,15 +576,15 @@ export const MonadIO: MonadIO1<URI> = {
  * @since 1.0.0
  */
 export const filterWithIndex: {
-  <A, B extends A>(refinementWithIndex: RefinementWithIndex<number, A, B>): (
-    fa: AsyncIterable<A>
-  ) => AsyncIterable<B>;
-  <A>(predicateWithIndex: PredicateWithIndex<number, A>): <B extends A>(
-    fb: AsyncIterable<A>
-  ) => AsyncIterable<B>;
-  <A>(predicateWithIndex: PredicateWithIndex<number, A>): (
-    fa: AsyncIterable<A>
-  ) => AsyncIterable<A>;
+  <A, B extends A>(
+    refinementWithIndex: RefinementWithIndex<number, A, B>,
+  ): (fa: AsyncIterable<A>) => AsyncIterable<B>;
+  <A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): <B extends A>(fb: AsyncIterable<A>) => AsyncIterable<B>;
+  <A>(
+    predicateWithIndex: PredicateWithIndex<number, A>,
+  ): (fa: AsyncIterable<A>) => AsyncIterable<A>;
 } =
   <A>(predicateWithIndex: PredicateWithIndex<number, A>) =>
   (fa: AsyncIterable<A>): AsyncIterable<A> => {
@@ -600,12 +608,12 @@ export const filterWithIndex: {
  * @since 1.0.0
  */
 export const filter: {
-  <A, B extends A>(refinement: Refinement<A, B>): (
-    fa: AsyncIterable<A>
-  ) => AsyncIterable<B>;
-  <A>(predicate: Predicate<A>): <B extends A>(
-    fb: AsyncIterable<B>
-  ) => AsyncIterable<B>;
+  <A, B extends A>(
+    refinement: Refinement<A, B>,
+  ): (fa: AsyncIterable<A>) => AsyncIterable<B>;
+  <A>(
+    predicate: Predicate<A>,
+  ): <B extends A>(fb: AsyncIterable<B>) => AsyncIterable<B>;
   <A>(predicate: Predicate<A>): (fa: AsyncIterable<A>) => AsyncIterable<A>;
 } = <A>(predicate: Predicate<A>) => filterWithIndex<A>((_, a) => predicate(a));
 
@@ -622,12 +630,12 @@ export interface PredicateTaskWithIndex<I, A> {
  * @since 1.0.0
  */
 export const filterTaskWithIndex: {
-  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): <B extends A>(
-    fb: AsyncIterable<B>
-  ) => AsyncIterable<B>;
-  <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>): (
-    fa: AsyncIterable<A>
-  ) => AsyncIterable<A>;
+  <A>(
+    predicateWithIndex: PredicateTaskWithIndex<number, A>,
+  ): <B extends A>(fb: AsyncIterable<B>) => AsyncIterable<B>;
+  <A>(
+    predicateWithIndex: PredicateTaskWithIndex<number, A>,
+  ): (fa: AsyncIterable<A>) => AsyncIterable<A>;
 } =
   <A>(predicateWithIndex: PredicateTaskWithIndex<number, A>) =>
   (fa: AsyncIterable<A>) => {
@@ -659,9 +667,9 @@ export interface PredicateTask<A> {
  * @since 1.0.0
  */
 export const filterTask: {
-  <A>(predicate: PredicateTask<A>): <B extends A>(
-    fb: AsyncIterable<B>
-  ) => AsyncIterable<B>;
+  <A>(
+    predicate: PredicateTask<A>,
+  ): <B extends A>(fb: AsyncIterable<B>) => AsyncIterable<B>;
   <A>(predicate: PredicateTask<A>): (fa: AsyncIterable<A>) => AsyncIterable<A>;
 } = <A>(predicate: PredicateTask<A>) =>
   filterTaskWithIndex<A>((_, a) => predicate(a));
@@ -741,7 +749,7 @@ export const compact: <A>(fa: AsyncIterable<Option<A>>) => AsyncIterable<A> =
  * @since 1.0.0
  */
 export const rights = <E, A>(
-  fa: AsyncIterable<Either<E, A>>
+  fa: AsyncIterable<Either<E, A>>,
 ): AsyncIterable<A> => {
   async function* next(): AsyncGenerator<A> {
     for await (const a of fa) {
@@ -761,7 +769,7 @@ export const rights = <E, A>(
  * @since 1.0.0
  */
 export const lefts = <E, A>(
-  fa: AsyncIterable<Either<E, A>>
+  fa: AsyncIterable<Either<E, A>>,
 ): AsyncIterable<E> => {
   async function* next(): AsyncGenerator<E> {
     for await (const a of fa) {
@@ -806,7 +814,7 @@ export const uniq =
  */
 export function transform<A, B>(
   transform: (a: A) => Option<B>,
-  flush?: () => B
+  flush?: () => B,
 ) {
   return (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let isFlushed = false;
@@ -837,7 +845,7 @@ export function transform<A, B>(
  */
 export function transformTask<A, B>(
   transform: (a: A) => Task<Option<B>>,
-  flush?: () => Task<B>
+  flush?: () => Task<B>,
 ) {
   return (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let isFlushed = false;
@@ -872,11 +880,11 @@ export function transformTask<A, B>(
 export const tap: {
   <A, _>(
     self: AsyncIterable<A>,
-    f: (a: A) => AsyncIterable<_>
+    f: (a: A) => AsyncIterable<_>,
   ): AsyncIterable<A>;
-  <A, _>(f: (a: A) => AsyncIterable<_>): (
-    self: AsyncIterable<A>
-  ) => AsyncIterable<A>;
+  <A, _>(
+    f: (a: A) => AsyncIterable<_>,
+  ): (self: AsyncIterable<A>) => AsyncIterable<A>;
 } = /*#__PURE__*/ dual(2, tap_(Chain));
 
 /**
@@ -946,9 +954,9 @@ export function toIterableLimited<A>(limit: number) {
       (_, b, a) => {
         b.push(a);
         return b;
-      }
+      },
     ),
-    T.map(I.fromReadonlyArray)
+    T.map(I.fromReadonlyArray),
   );
 }
 
@@ -981,7 +989,7 @@ export function toArrayLimited<A>(limit: number) {
     (i, b, a) => {
       b[i] = a;
       return b;
-    }
+    },
   );
 }
 
@@ -1012,8 +1020,8 @@ export const foldMapWithIndexPar =
     pipe(
       fa,
       reduceUntilWithIndexLimited(limit, constTrue, M.empty, (i, b, a) =>
-        M.concat(b, f(i, a))
-      )
+        M.concat(b, f(i, a)),
+      ),
     );
 
 /**
@@ -1022,7 +1030,7 @@ export const foldMapWithIndexPar =
  */
 export const foldMapPar: <M>(
   M: Monoid<M>,
-  limit: number
+  limit: number,
 ) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => Task<M> = (M, limit) => {
   const foldMapWithIndexM = foldMapWithIndexPar(M, limit);
   return (f) => foldMapWithIndexM((_, a) => f(a));
@@ -1033,7 +1041,7 @@ export const foldMapPar: <M>(
  * @since 1.0.0
  */
 export const foldMapSeq: <M>(
-  M: Monoid<M>
+  M: Monoid<M>,
 ) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => Task<M> = (M) => {
   const foldMapWithIndexM = foldMapWithIndexPar(M, 1);
   return (f) => foldMapWithIndexM((_, a) => f(a));
