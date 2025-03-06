@@ -1,6 +1,6 @@
 {
   "name": "fp-ts-iterators",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Functional Iterable and AsyncIterable",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
