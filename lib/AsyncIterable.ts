@@ -314,6 +314,8 @@ export const ap =
   <A>(fa: AsyncIterable<A>) =>
   <B>(fab: AsyncIterable<(a: A) => B>): AsyncIterable<B> => {
     const fabTask = pipe(fab, toArraySeq());
+
+    let fabPromise: undefined | ReturnType<typeof fabTask>;
     let fabs: undefined | Array<(a: A) => B>;
     let i = 0;
     let a: A;
@@ -321,8 +323,12 @@ export const ap =
 
     return {
       async *[Symbol.asyncIterator]() {
+        if (!fabPromise) {
+          fabPromise = fabTask();
+        }
+
         if (!fabs) {
-          fabs = await fabTask();
+          fabs = await fabPromise;
         }
 
         if (i === fabs.length || justStarted) {
@@ -346,6 +352,8 @@ export const apTask =
   <A>(fa: AsyncIterable<A>) =>
   <B>(fab: AsyncIterable<(a: A) => Task<B>>): AsyncIterable<B> => {
     const fabTask = pipe(fab, toArraySeq());
+
+    let fabPromise: undefined | ReturnType<typeof fabTask>;
     let fabs: undefined | Array<(a: A) => Task<B>>;
     let i = 0;
     let a: A;
@@ -353,8 +361,12 @@ export const apTask =
 
     return {
       async *[Symbol.asyncIterator]() {
+        if (!fabPromise) {
+          fabPromise = fabTask();
+        }
+
         if (!fabs) {
-          fabs = await fabTask();
+          fabs = await fabPromise;
         }
 
         if (i === fabs.length || justStarted) {
@@ -449,13 +461,21 @@ export const flatMapIterable =
     const next = pipe(fa, getAsyncIteratorNextTask, TO.map(flow(f, I.toArray)));
 
     let i = 0;
-    let bs: undefined | Array<B>;
+    let bs: undefined | B[];
+    let nextPromise: undefined | ReturnType<typeof next>;
 
     return {
       async *[Symbol.asyncIterator]() {
         if (!bs) {
-          const nextBs = await next();
+          if (!nextPromise) {
+            nextPromise = next();
+          }
+
+          const nextBs = await nextPromise;
           if (O.isNone(nextBs)) {
+            i = 0;
+            bs = undefined;
+            nextPromise = undefined;
             return;
           }
 
@@ -464,8 +484,9 @@ export const flatMapIterable =
 
         const b = bs[i++];
         if (i === bs.length) {
-          bs = undefined;
           i = 0;
+          bs = undefined;
+          nextPromise = undefined;
         }
 
         yield b;

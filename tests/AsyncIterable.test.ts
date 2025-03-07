@@ -19,7 +19,7 @@ describe("AsyncIterable", () => {
     const test = pipe(createTestAsyncIterableWithError(), AI.toArraySeq());
 
     await expect(test).rejects.toThrow(
-      "This should never have happened. Use AsyncIterableEither or AsyncIterableOption tryCatch function to handle errors"
+      "This should never have happened. Use AsyncIterableEither or AsyncIterableOption tryCatch function to handle errors",
     );
   });
 
@@ -43,7 +43,7 @@ describe("AsyncIterable", () => {
     const test = pipe(
       createTestAsyncIterable(reverseDelay),
       AI.toIterablePar(10),
-      T.map(Array.from)
+      T.map(Array.from),
     );
 
     const values = await test();
@@ -56,7 +56,7 @@ describe("AsyncIterable", () => {
     const test = pipe(
       createTestAsyncIterable(reverseDelay),
       AI.toIterablePar(5),
-      T.map(Array.from)
+      T.map(Array.from),
     );
 
     const values = await test();
@@ -74,7 +74,7 @@ describe("AsyncIterable", () => {
       Promise.resolve(i < 5 ? O.some(i) : O.none);
     const values = await pipe(
       AI.makeByTaskWithIndex(makeBy5),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([0, 1, 2, 3, 4]);
   });
@@ -88,7 +88,7 @@ describe("AsyncIterable", () => {
   test("unfoldTask", async () => {
     const unfoldTask = AI.unfoldTask(
       5,
-      (n) => () => Promise.resolve(n > 0 ? O.some([n, n - 1]) : O.none)
+      (n) => () => Promise.resolve(n > 0 ? O.some([n, n - 1]) : O.none),
     );
     const values = await pipe(unfoldTask, AI.toArraySeq())();
     expect(values).toStrictEqual([5, 4, 3, 2, 1]);
@@ -103,7 +103,7 @@ describe("AsyncIterable", () => {
   test("fromIO", async () => {
     const values = await pipe(
       AI.fromIO(() => "test"),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["test"]);
   });
@@ -111,7 +111,7 @@ describe("AsyncIterable", () => {
   test("fromTask", async () => {
     const values = await pipe(
       AI.fromTask(() => Promise.resolve("test")),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["test"]);
   });
@@ -125,7 +125,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([0, 1, 2]),
       AI.map((i) => i + 1),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2, 3]);
   });
@@ -134,7 +134,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([0, 1, 2]),
       AI.mapWithIndex((i, n) => i + n),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([0, 2, 4]);
   });
@@ -143,7 +143,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([0, 1, 2]),
       AI.as(1),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 1, 1]);
   });
@@ -152,7 +152,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([0, 1, 2]),
       AI.asUnit,
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([undefined, undefined, undefined]);
   });
@@ -161,7 +161,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([(x: number) => x * 2, (x: number) => x * 3]),
       AI.ap(AI.fromIterable([1, 2, 3])),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([2, 3, 4, 6, 6, 9]);
   });
@@ -170,7 +170,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([(x: number) => T.of(x * 2), (x: number) => T.of(x * 3)]),
       AI.apTask(AI.fromIterable([1, 2, 3])),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([2, 3, 4, 6, 6, 9]);
   });
@@ -179,7 +179,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2]),
       AI.apFirst(AI.fromIterable(["a", "b", "c"])),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2, 1, 2, 1, 2]);
   });
@@ -188,7 +188,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2]),
       AI.apSecond(AI.fromIterable(["a", "b", "c"])),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["a", "a", "b", "b", "c", "c"]);
   });
@@ -197,7 +197,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.flatMap((i) => AI.fromIterable([i - 1, i + 1])),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([0, 2, 1, 3, 2, 4]);
   });
@@ -206,7 +206,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.flatMapIterable((i) => [i, i + 1]),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2, 2, 3, 3, 4]);
   });
@@ -215,7 +215,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.flatMapTaskWithIndex((i, a) => T.of(i + a)),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 3, 5]);
   });
@@ -228,9 +228,22 @@ describe("AsyncIterable", () => {
         AI.fromIterable([4]),
       ]),
       AI.flatten,
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2, 3, 4]);
+  });
+
+  test("flattenIterable", async () => {
+    const values = await pipe(
+      AI.fromIterable([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ]),
+      AI.flattenIterable,
+      AI.toArraySeq(),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   test("filterWithIndex", async () => {
@@ -239,7 +252,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable(["a", "b", "c"]),
       AI.filterWithIndex(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["a", "c"]);
   });
@@ -249,7 +262,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.filter(g),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([1, 3]);
@@ -259,7 +272,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([O.some(3), O.some(2), O.some(1)]),
       AI.filter(O.isSome),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([O.some(3), O.some(2), O.some(1)]);
@@ -269,7 +282,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([O.some(3), O.none, O.some(1)]),
       AI.filter(O.isSome),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([O.some(3), O.some(1)]);
@@ -281,7 +294,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable(["a", "b", "c"]),
       AI.filterTaskWithIndex(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["a", "c"]);
   });
@@ -291,7 +304,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.filterTask(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([1, 3]);
@@ -304,7 +317,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 4]),
       AI.filterMapWithIndex(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2]);
   });
@@ -315,7 +328,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.filterMap(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 3]);
   });
@@ -327,7 +340,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 4]),
       AI.filterMapTaskWithIndex(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2]);
   });
@@ -339,7 +352,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.filterMapTask(f),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 3]);
   });
@@ -348,7 +361,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([E.right(1), E.left("foo"), E.right(2)]),
       AI.rights,
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual([1, 2]);
   });
@@ -357,7 +370,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([E.right(1), E.left("foo"), E.right(2)]),
       AI.lefts,
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
     expect(values).toStrictEqual(["foo"]);
   });
@@ -370,7 +383,7 @@ describe("AsyncIterable", () => {
 
     const eqA = pipe(
       N.Ord,
-      contramap((f: A) => f.b)
+      contramap((f: A) => f.b),
     );
     const arrA: A = { a: "a", b: 1 };
     const arrB: A = { a: "b", b: 1 };
@@ -381,12 +394,12 @@ describe("AsyncIterable", () => {
     async function strictEqual<A>(
       eq: Eq<A>,
       input: Array<A>,
-      output: Array<A>
+      output: Array<A>,
     ) {
       const values = await pipe(
         AI.fromIterable(input),
         AI.uniq(eq),
-        AI.toArraySeq()
+        AI.toArraySeq(),
       )();
       expect(values).toStrictEqual(output);
     }
@@ -416,7 +429,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.transform(O.some),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([1, 2, 3]);
@@ -433,7 +446,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.transform(transform, flush),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([6]);
@@ -450,7 +463,7 @@ describe("AsyncIterable", () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.transformTask(transform, flush),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([6]);
@@ -459,7 +472,7 @@ describe("AsyncIterable", () => {
   test("foldMapSeq", async () => {
     const values = await pipe(
       AI.fromIterable(["a", "b", "c"]),
-      AI.foldMapSeq(S.Monoid)(identity)
+      AI.foldMapSeq(S.Monoid)(identity),
     )();
 
     expect(values).toStrictEqual("abc");
@@ -472,7 +485,7 @@ describe("AsyncIterable", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([1, 2, 3]);
-      })
+      }),
     );
 
     return test;
@@ -488,7 +501,7 @@ describe("AsyncIterable", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([1, 2, 3]);
-      })
+      }),
     )();
 
     expect(ref).toStrictEqual([1, 2, 3]);
@@ -504,7 +517,7 @@ describe("AsyncIterable", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([1, 2, 3]);
-      })
+      }),
     )();
 
     expect(ref).toStrictEqual([1, 2, 3]);

@@ -55,7 +55,10 @@ import { LazyArg, flow, identity, pipe } from "fp-ts/lib/function";
 import { MonadTask2 } from "fp-ts/lib/MonadTask";
 import * as AI from "./AsyncIterable";
 import { AsyncIterableOption } from "./AsyncIterableOption";
-import { reduceUntilWithIndexLimited } from "./AsyncIterableReduce";
+import {
+  getAsyncIteratorNextTask,
+  reduceUntilWithIndexLimited,
+} from "./AsyncIterableReduce";
 import * as I from "./Iterable";
 import {
   asUnit as asUnit_,
@@ -495,15 +498,57 @@ export const flatMap: {
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable: {
-  <A, B>(
-    f: (a: A) => Iterable<B>,
-  ): <E>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>;
-  <E, A, B>(
-    ma: AsyncIterableEither<E, A>,
-    f: (a: A) => Iterable<B>,
-  ): AsyncIterableEither<E, B>;
-} = dual(2, flatMap_(I.Monad));
+export const flatMapIterable =
+  <A, B>(f: (a: A) => Iterable<B>) =>
+  <E>(fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
+    const next = pipe(
+      fa,
+      getAsyncIteratorNextTask,
+      TO.map(E.map(flow(f, I.toArray))),
+    );
+
+    let i = 0;
+    let bs: undefined | B[];
+    let nextPromise: undefined | ReturnType<typeof next>;
+
+    return {
+      async *[Symbol.asyncIterator]() {
+        if (!bs) {
+          if (!nextPromise) {
+            nextPromise = next();
+          }
+
+          const nextBs = await nextPromise;
+          if (O.isNone(nextBs)) {
+            i = 0;
+            bs = undefined;
+            nextPromise = undefined;
+            return;
+          }
+
+          if (E.isLeft(nextBs.value)) {
+            i = 0;
+            bs = undefined;
+            nextPromise = undefined;
+            yield nextBs.value;
+          } else {
+            bs = nextBs.value.right;
+          }
+        }
+
+        if (bs) {
+          const b = bs[i++];
+          if (i === bs.length) {
+            i = 0;
+            bs = undefined;
+            nextPromise = undefined;
+          }
+
+          yield E.right(b);
+        }
+      },
+    };
+  };
 
 /**
  * @category sequencing
