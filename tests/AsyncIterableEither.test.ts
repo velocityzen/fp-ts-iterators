@@ -393,10 +393,43 @@ describe("AsyncIterableEither", () => {
     return test();
   });
 
+  test("flatten", () => {
+    const test = pipe(
+      AI.fromIterable([E.right(1), E.left("2"), E.right(3)]),
+      AIE.map((a) => (a < 2 ? AIE.right(a) : AIE.left("foo"))),
+      AIE.flatten,
+      AI.toArraySeq(),
+      T.map((value) => {
+        expect(value).toStrictEqual([E.right(1), E.left("2"), E.left("foo")]);
+      }),
+    );
+
+    return test();
+  });
+
   test("flatMapIterable", () => {
     const test = pipe(
       AI.fromIterable([E.right([1, 2]), E.left("3"), E.right([4, 5])]),
       AIE.flatMapIterable(identity),
+      AI.toArraySeq(),
+      T.map((value) => {
+        expect(value).toStrictEqual([
+          E.right(1),
+          E.right(2),
+          E.left("3"),
+          E.right(4),
+          E.right(5),
+        ]);
+      }),
+    );
+
+    return test();
+  });
+
+  test("flattenIterable", () => {
+    const test = pipe(
+      AI.fromIterable([E.right([1, 2]), E.left("3"), E.right([4, 5])]),
+      AIE.flattenIterable,
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([
