@@ -198,9 +198,9 @@ export const fromIterable: <A>(fa: Iterable<A>) => AsyncIterable<A> = (fa) =>
  * @category conversions
  * @since 1.0.0
  */
-export function fromAsyncGenerator<A, R, N>(
-  fa: LazyArg<AsyncGenerator<A, R, N>>,
-) {
+export function fromAsyncGenerator<A>(
+  fa: LazyArg<AsyncGenerator<A>>,
+): AsyncIterable<A> {
   return {
     async *[Symbol.asyncIterator]() {
       yield* fa();

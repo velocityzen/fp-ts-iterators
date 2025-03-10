@@ -15,8 +15,7 @@ import * as G from "./Generator";
  */
 export function fromLazyArg<A>(f: () => A): AsyncGenerator<A> {
   async function* next(): AsyncGenerator<A> {
-    const res = f();
-    yield res;
+    yield f();
   }
 
   return next();
@@ -28,8 +27,7 @@ export function fromLazyArg<A>(f: () => A): AsyncGenerator<A> {
  */
 export function fromTask<A>(f: Task<A>): AsyncGenerator<A> {
   async function* next(): AsyncGenerator<A> {
-    const res = await f();
-    yield res;
+    yield await f();
   }
 
   return next();
@@ -58,9 +56,7 @@ export function fromIterable<A>(fa: Iterable<A>): LazyArg<AsyncGenerator<A>> {
  */
 export function fromAsyncIterable<A>(fa: AsyncIterable<A>): AsyncGenerator<A> {
   async function* next(): AsyncGenerator<A> {
-    for await (const a of fa) {
-      yield a;
-    }
+    yield* fa;
   }
 
   return next();
