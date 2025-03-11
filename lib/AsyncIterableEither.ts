@@ -501,7 +501,7 @@ export const flatMap: {
 export const flatMapIterable =
   <A, B>(f: (a: A) => Iterable<B>) =>
   <E>(fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
-    const next = pipe(
+    const nextIB = pipe(
       fa,
       getAsyncIteratorNextTask,
       TO.map(E.map(flow(f, I.toArray))),
@@ -509,42 +509,48 @@ export const flatMapIterable =
 
     let i = 0;
     let bs: undefined | B[];
-    let nextPromise: undefined | ReturnType<typeof next>;
+    let nextPromise: undefined | ReturnType<typeof nextIB>;
+
+    async function next(): Promise<O.Option<E.Either<E, B>>> {
+      if (!bs) {
+        if (!nextPromise) {
+          nextPromise = nextIB();
+        }
+
+        const nextBs = await nextPromise;
+        if (O.isNone(nextBs)) {
+          i = 0;
+          bs = undefined;
+          nextPromise = undefined;
+          return O.none;
+        }
+
+        if (E.isLeft(nextBs.value)) {
+          i = 0;
+          bs = undefined;
+          nextPromise = undefined;
+          return O.some(nextBs.value);
+        } else {
+          bs = nextBs.value.right;
+        }
+      }
+
+      const b = bs[i++];
+      if (i <= bs.length) {
+        return O.some(E.right(b));
+      }
+
+      i = 0;
+      bs = undefined;
+      nextPromise = undefined;
+      return next();
+    }
 
     return {
       async *[Symbol.asyncIterator]() {
-        if (!bs) {
-          if (!nextPromise) {
-            nextPromise = next();
-          }
-
-          const nextBs = await nextPromise;
-          if (O.isNone(nextBs)) {
-            i = 0;
-            bs = undefined;
-            nextPromise = undefined;
-            return;
-          }
-
-          if (E.isLeft(nextBs.value)) {
-            i = 0;
-            bs = undefined;
-            nextPromise = undefined;
-            yield nextBs.value;
-          } else {
-            bs = nextBs.value.right;
-          }
-        }
-
-        if (bs) {
-          const b = bs[i++];
-          if (i === bs.length) {
-            i = 0;
-            bs = undefined;
-            nextPromise = undefined;
-          }
-
-          yield E.right(b);
+        const o = await next();
+        if (O.isSome(o)) {
+          yield o.value;
         }
       },
     };

@@ -458,38 +458,50 @@ export const flatMap =
 export const flatMapIterable =
   <A, B>(f: (a: A) => Iterable<B>) =>
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
-    const next = pipe(fa, getAsyncIteratorNextTask, TO.map(flow(f, I.toArray)));
+    const nextIB = pipe(
+      fa,
+      getAsyncIteratorNextTask,
+      TO.map(flow(f, I.toArray)),
+    );
 
     let i = 0;
     let bs: undefined | B[];
-    let nextPromise: undefined | ReturnType<typeof next>;
+    let nextPromise: undefined | ReturnType<typeof nextIB>;
 
-    return {
-      async *[Symbol.asyncIterator]() {
-        if (!bs) {
-          if (!nextPromise) {
-            nextPromise = next();
-          }
-
-          const nextBs = await nextPromise;
-          if (O.isNone(nextBs)) {
-            i = 0;
-            bs = undefined;
-            nextPromise = undefined;
-            return;
-          }
-
-          bs = nextBs.value;
+    async function next() {
+      if (!bs) {
+        if (!nextPromise) {
+          nextPromise = nextIB();
         }
 
-        const b = bs[i++];
-        if (i === bs.length) {
+        const nextBs = await nextPromise;
+        if (O.isNone(nextBs)) {
           i = 0;
           bs = undefined;
           nextPromise = undefined;
+          return O.none;
         }
 
-        yield b;
+        bs = nextBs.value;
+      }
+
+      const b = bs[i++];
+      if (i <= bs.length) {
+        return O.some(b);
+      }
+
+      i = 0;
+      bs = undefined;
+      nextPromise = undefined;
+      return next();
+    }
+
+    return {
+      async *[Symbol.asyncIterator]() {
+        const o = await next();
+        if (O.isSome(o)) {
+          yield o.value;
+        }
       },
     };
   };

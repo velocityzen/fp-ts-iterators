@@ -202,13 +202,33 @@ describe("AsyncIterable", () => {
     expect(values).toStrictEqual([0, 2, 1, 3, 2, 4]);
   });
 
+  test("flatMap / empty item", async () => {
+    const values = await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.flatMap((i) =>
+        i === 2 ? AI.fromIterable([]) : AI.fromIterable([i - 1, i + 1]),
+      ),
+      AI.toArraySeq(),
+    )();
+    expect(values).toStrictEqual([0, 2, 2, 4]);
+  });
+
   test("flatMapIterable", async () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
-      AI.flatMapIterable((i) => [i, i + 1]),
+      AI.flatMapIterable((i) => (i === 2 ? [i] : [i, i + 1])),
       AI.toArraySeq(),
     )();
-    expect(values).toStrictEqual([1, 2, 2, 3, 3, 4]);
+    expect(values).toStrictEqual([1, 2, 2, 3, 4]);
+  });
+
+  test("flatMapIterable / empty item", async () => {
+    const values = await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.flatMapIterable((i) => (i === 2 ? [] : [i, i + 1])),
+      AI.toArraySeq(),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4]);
   });
 
   test("flatMapTaskWithIndex", async () => {

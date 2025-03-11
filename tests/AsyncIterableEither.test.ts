@@ -426,6 +426,30 @@ describe("AsyncIterableEither", () => {
     return test();
   });
 
+  test("flatMapIterable / empty item", () => {
+    const test = pipe(
+      AI.fromIterable([
+        E.right([1, 2]),
+        E.left("3"),
+        E.right([]),
+        E.right([4, 5]),
+      ]),
+      AIE.flatMapIterable(identity),
+      AI.toArraySeq(),
+      T.map((value) => {
+        expect(value).toStrictEqual([
+          E.right(1),
+          E.right(2),
+          E.left("3"),
+          E.right(4),
+          E.right(5),
+        ]);
+      }),
+    );
+
+    return test();
+  });
+
   test("flattenIterable", () => {
     const test = pipe(
       AI.fromIterable([E.right([1, 2]), E.left("3"), E.right([4, 5])]),
