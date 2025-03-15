@@ -3,6 +3,7 @@
  */
 import * as O from "fp-ts/lib/Option";
 import * as T from "fp-ts/lib/Task";
+import { nextTick } from "node:process";
 
 /**
  * @category sequencing
@@ -84,10 +85,15 @@ export function reduceUntilWithIndexLimited<A, B>(
         }
 
         running--;
-        run();
-        if (running === 0) {
-          resolve(out);
-        }
+
+        // keeps it safe from race conditions
+        // due to some iterators resolve synchronously
+        nextTick(() => {
+          run();
+          if (running === 0) {
+            resolve(out);
+          }
+        });
       }
 
       while (running < limit) {

@@ -423,11 +423,13 @@ export const flatMap =
 
     const nextAIFB = pipe(fa, getAsyncIteratorNextTask, TO.map(f));
     let isNextAIFBDone = false;
-    let waitingForValues = 0;
+    let waitingForValues = 0; // fight against race conditions
 
     async function toBuffer() {
       if (!isNextAIFBDone && toBufferQueue.length === 0) {
+        waitingForValues++;
         const maybeAIB = await nextAIFB();
+        waitingForValues--;
 
         if (O.isSome(maybeAIB)) {
           const nextAIB = getAsyncIteratorNextTask(maybeAIB.value);
@@ -445,6 +447,7 @@ export const flatMap =
       waitingForValues++;
       const maybeB = await nextAIB();
       waitingForValues--;
+
       if (O.isSome(maybeB)) {
         buffer.push(maybeB.value);
       } else {

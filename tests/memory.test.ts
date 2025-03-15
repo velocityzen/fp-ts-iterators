@@ -10,6 +10,7 @@ import { simpleFaker } from "@faker-js/faker";
 describe("Memory leaks", () => {
   test("run iterators with thousands of items", () => {
     let length = 0;
+
     function makeIterators(i: number, j: number) {
       return () => {
         if (i === 0) {

@@ -201,6 +201,24 @@ describe("AsyncIterable", () => {
     expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6]);
   });
 
+  test("flatMap / par / more values than iterators", async () => {
+    const values = await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.flatMap((i) => AI.fromIterable([i, i + 1, i + 2, i + 3])),
+      AI.toArrayPar(2),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6]);
+  });
+
+  test("flatMap / par / more iterators than values", async () => {
+    const values = await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.flatMap((i) => AI.fromIterable([i, i + 1, i + 2, i + 3])),
+      AI.toArrayPar(10),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6]);
+  });
+
   test("flatMap / empty item", async () => {
     const values = await pipe(
       AI.fromIterable([0, 1, 2, 3, 4]),
@@ -225,6 +243,53 @@ describe("AsyncIterable", () => {
       AI.toArrayPar(10),
     )();
     expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
+  });
+
+  test("flatMap / empty last element", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2]),
+      AI.flatMap((i) =>
+        i === 2
+          ? AI.fromIterable([])
+          : AI.fromIterable([i, i + 1, i + 2, i + 3]),
+      ),
+      AI.toArraySeq(),
+    )();
+    expect(values).toStrictEqual([0, 1, 2, 3, 1, 2, 3, 4]);
+  });
+
+  test("flatMap / par / empty last element", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2]),
+      AI.flatMap((i) =>
+        i === 2
+          ? AI.fromIterable([])
+          : AI.fromIterable([i, i + 1, i + 2, i + 3]),
+      ),
+      AI.toArrayPar(10),
+    )();
+
+    expect(values).toStrictEqual([0, 1, 2, 3, 1, 2, 3, 4]);
+  });
+
+  test("flatMap / all empty elements", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2]),
+      AI.flatMap(() => AI.fromIterable([])),
+      AI.toArraySeq(),
+    )();
+
+    expect(values).toStrictEqual([]);
+  });
+
+  test("flatMap / par / all empty elements", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2]),
+      AI.flatMap(() => AI.fromIterable([])),
+      AI.toArrayPar(10),
+    )();
+
+    expect(values).toStrictEqual([]);
   });
 
   test("flatMapIterable", async () => {
