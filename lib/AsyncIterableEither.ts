@@ -498,63 +498,10 @@ export const flatMap: {
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable =
-  <A, B>(f: (a: A) => Iterable<B>) =>
-  <E>(fa: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> => {
-    const nextIB = pipe(
-      fa,
-      getAsyncIteratorNextTask,
-      TO.map(E.map(flow(f, I.toArray))),
-    );
-
-    let i = 0;
-    let bs: undefined | B[];
-    let nextPromise: undefined | ReturnType<typeof nextIB>;
-
-    async function next(): Promise<O.Option<E.Either<E, B>>> {
-      if (!bs) {
-        if (!nextPromise) {
-          nextPromise = nextIB();
-        }
-
-        const nextBs = await nextPromise;
-        if (O.isNone(nextBs)) {
-          i = 0;
-          bs = undefined;
-          nextPromise = undefined;
-          return O.none;
-        }
-
-        if (E.isLeft(nextBs.value)) {
-          i = 0;
-          bs = undefined;
-          nextPromise = undefined;
-          return O.some(nextBs.value);
-        } else {
-          bs = nextBs.value.right;
-        }
-      }
-
-      const b = bs[i++];
-      if (i <= bs.length) {
-        return O.some(E.right(b));
-      }
-
-      i = 0;
-      bs = undefined;
-      nextPromise = undefined;
-      return next();
-    }
-
-    return {
-      async *[Symbol.asyncIterator]() {
-        const o = await next();
-        if (O.isSome(o)) {
-          yield o.value;
-        }
-      },
-    };
-  };
+export const flatMapIterable = <E, A, B>(f: (a: A) => Iterable<B>) => {
+  const aief = (a: A): AsyncIterableEither<E, B> => pipe(a, f, fromIterable);
+  return flatMap(aief);
+};
 
 /**
  * @category sequencing
