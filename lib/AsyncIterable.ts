@@ -34,12 +34,10 @@ import { Monad1 } from "fp-ts/lib/Monad";
 import { MonadIO1 } from "fp-ts/lib/MonadIO";
 import { Monoid } from "fp-ts/lib/Monoid";
 import * as O from "fp-ts/lib/Option";
-import { Option } from "fp-ts/lib/Option";
 import { Pointed1 } from "fp-ts/lib/Pointed";
 import { Predicate } from "fp-ts/lib/Predicate";
 import { Refinement } from "fp-ts/lib/Refinement";
 import * as T from "fp-ts/lib/Task";
-import { Task } from "fp-ts/lib/Task";
 import * as TO from "fp-ts/lib/TaskOption";
 import { Unfoldable1 } from "fp-ts/lib/Unfoldable";
 import {
@@ -92,7 +90,7 @@ declare module "fp-ts/lib/HKT" {
  * @since 1.0.0
  */
 export const makeByWithIndex = <A>(
-  f: (i: number) => Option<A>,
+  f: (i: number) => O.Option<A>,
 ): AsyncIterable<A> => {
   let i = 0;
 
@@ -110,7 +108,7 @@ export const makeByWithIndex = <A>(
  * @category constructors
  * @since 1.0.0
  */
-export const makeBy = <A>(f: () => Option<A>): AsyncIterable<A> =>
+export const makeBy = <A>(f: () => O.Option<A>): AsyncIterable<A> =>
   makeByWithIndex(() => f());
 
 /**
@@ -122,7 +120,7 @@ export const makeBy = <A>(f: () => Option<A>): AsyncIterable<A> =>
  * @since 1.0.0
  */
 export const makeByTaskWithIndex = <A>(
-  f: (i: number) => Task<Option<A>>,
+  f: (i: number) => T.Task<O.Option<A>>,
 ): AsyncIterable<A> => {
   let i = 0;
 
@@ -140,7 +138,7 @@ export const makeByTaskWithIndex = <A>(
  * @category constructors
  * @since 1.0.0
  */
-export const makeByTask = <A>(f: () => Task<Option<A>>): AsyncIterable<A> =>
+export const makeByTask = <A>(f: () => T.Task<O.Option<A>>): AsyncIterable<A> =>
   makeByTaskWithIndex(() => f());
 
 /**
@@ -149,7 +147,7 @@ export const makeByTask = <A>(f: () => Task<Option<A>>): AsyncIterable<A> =>
  */
 export const unfold = <A, B>(
   b: B,
-  f: (b: B) => Option<readonly [A, B]>,
+  f: (b: B) => O.Option<readonly [A, B]>,
 ): AsyncIterable<A> => {
   let bb: B = b;
 
@@ -171,7 +169,7 @@ export const unfold = <A, B>(
  */
 export const unfoldTask = <A, B>(
   b: B,
-  f: (b: B) => Task<Option<readonly [A, B]>>,
+  f: (b: B) => T.Task<O.Option<readonly [A, B]>>,
 ): AsyncIterable<A> => {
   let bb: B = b;
 
@@ -225,7 +223,7 @@ export const fromIO: <A>(fa: IO<A>) => AsyncIterable<A> = fromLazyArg;
  * @category conversions
  * @since 1.0.0
  */
-export const fromTask: <A>(fa: Task<A>) => AsyncIterable<A> = AG.fromTask;
+export const fromTask: <A>(fa: T.Task<A>) => AsyncIterable<A> = AG.fromTask;
 
 /**
  * @category constructors
@@ -350,11 +348,11 @@ export const ap =
  */
 export const apTask =
   <A>(fa: AsyncIterable<A>) =>
-  <B>(fab: AsyncIterable<(a: A) => Task<B>>): AsyncIterable<B> => {
+  <B>(fab: AsyncIterable<(a: A) => T.Task<B>>): AsyncIterable<B> => {
     const fabTask = pipe(fab, toArraySeq());
 
     let fabPromise: undefined | ReturnType<typeof fabTask>;
-    let fabs: undefined | Array<(a: A) => Task<B>>;
+    let fabs: undefined | Array<(a: A) => T.Task<B>>;
     let i = 0;
     let a: A;
     let justStarted = true;
@@ -419,26 +417,95 @@ export const Applicative: Applicative1<URI> = {
 export const flatMap =
   <A, B>(f: (a: A) => AsyncIterable<B>) =>
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
-    const nextBs = pipe(fa, getAsyncIteratorNextTask, TO.map(f));
-    let nextB: undefined | Task<Option<B>>;
+    const buffer: B[] = [];
+    const toBufferQueue: T.Task<O.Option<B>>[] = [];
+    const fromBufferQueue: ((b: O.Option<B>) => void)[] = [];
 
-    async function next() {
-      if (!nextB) {
-        const optionalBs = await nextBs();
-        if (O.isNone(optionalBs)) {
-          return O.none;
+    const nextAIFB = pipe(fa, getAsyncIteratorNextTask, TO.map(f));
+    let isNextAIFBDone = false;
+    let waitingForValues = 0;
+
+    async function toBuffer() {
+      if (!isNextAIFBDone && toBufferQueue.length === 0) {
+        const maybeAIB = await nextAIFB();
+
+        if (O.isSome(maybeAIB)) {
+          const nextAIB = getAsyncIteratorNextTask(maybeAIB.value);
+          toBufferQueue.push(nextAIB);
+        } else {
+          isNextAIFBDone = true;
+        }
+      }
+
+      if (toBufferQueue.length === 0) {
+        return;
+      }
+
+      const nextAIB = toBufferQueue[0];
+      waitingForValues++;
+      const maybeB = await nextAIB();
+      waitingForValues--;
+      if (O.isSome(maybeB)) {
+        buffer.push(maybeB.value);
+      } else {
+        const i = toBufferQueue.findIndex((aib) => aib === nextAIB);
+        if (i !== -1) {
+          toBufferQueue.splice(i, 1);
         }
 
-        nextB = getAsyncIteratorNextTask(optionalBs.value);
+        if (
+          !isNextAIFBDone ||
+          (buffer.length === 0 && toBufferQueue.length > 0)
+        ) {
+          await toBuffer();
+        }
       }
 
-      const b = await nextB();
-      if (O.isSome(b)) {
-        return b;
+      dispatchFromBuffer();
+    }
+
+    function dispatchFromBuffer() {
+      if (buffer.length > 0) {
+        const fromTasks = fromBufferQueue.splice(0, buffer.length);
+        const values = buffer.splice(0, fromTasks.length);
+
+        pipe(
+          fromTasks,
+          A.zip(values),
+          A.map(([task, value]) => {
+            task(O.some(value));
+          }),
+        );
       }
 
-      nextB = undefined;
-      return next();
+      if (
+        waitingForValues > 0 ||
+        toBufferQueue.length > 0 ||
+        buffer.length > 0
+      ) {
+        return;
+      }
+
+      const hopeless = fromBufferQueue.splice(0);
+      hopeless.forEach((task) => {
+        task(O.none);
+      });
+    }
+
+    function addToFromBufferQueue() {
+      return new Promise<O.Option<B>>((resolve) =>
+        fromBufferQueue.push(resolve),
+      );
+    }
+
+    async function next(): Promise<O.Option<B>> {
+      if (buffer.length > 0) {
+        return O.some(buffer.shift() as B);
+      }
+
+      const fromBuffer = addToFromBufferQueue();
+      await toBuffer();
+      return fromBuffer;
     }
 
     return {
@@ -455,63 +522,17 @@ export const flatMap =
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable =
-  <A, B>(f: (a: A) => Iterable<B>) =>
-  (fa: AsyncIterable<A>): AsyncIterable<B> => {
-    const nextIB = pipe(
-      fa,
-      getAsyncIteratorNextTask,
-      TO.map(flow(f, I.toArray)),
-    );
-
-    let i = 0;
-    let bs: undefined | B[];
-    let nextPromise: undefined | ReturnType<typeof nextIB>;
-
-    async function next() {
-      if (!bs) {
-        if (!nextPromise) {
-          nextPromise = nextIB();
-        }
-
-        const nextBs = await nextPromise;
-        if (O.isNone(nextBs)) {
-          i = 0;
-          bs = undefined;
-          nextPromise = undefined;
-          return O.none;
-        }
-
-        bs = nextBs.value;
-      }
-
-      const b = bs[i++];
-      if (i <= bs.length) {
-        return O.some(b);
-      }
-
-      i = 0;
-      bs = undefined;
-      nextPromise = undefined;
-      return next();
-    }
-
-    return {
-      async *[Symbol.asyncIterator]() {
-        const o = await next();
-        if (O.isSome(o)) {
-          yield o.value;
-        }
-      },
-    };
-  };
+export const flatMapIterable = <A, B>(f: (a: A) => Iterable<B>) => {
+  const aif = (a: A): AsyncIterable<B> => pipe(a, f, fromIterable);
+  return flatMap(aif);
+};
 
 /**
  * @category sequencing
  * @since 1.0.0
  */
 export const flatMapTaskWithIndex =
-  <A, B>(f: (index: number, a: A) => Task<B>) =>
+  <A, B>(f: (index: number, a: A) => T.Task<B>) =>
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let i = 0;
 
@@ -528,7 +549,7 @@ export const flatMapTaskWithIndex =
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapTask = <A, B>(f: (a: A) => Task<B>) =>
+export const flatMapTask = <A, B>(f: (a: A) => T.Task<B>) =>
   flatMapTaskWithIndex((_i, a: A) => f(a));
 
 /**
@@ -655,7 +676,7 @@ export const filter: {
  * @since 1.0.0
  */
 export interface PredicateTaskWithIndex<I, A> {
-  (i: I, a: A): Task<boolean>;
+  (i: I, a: A): T.Task<boolean>;
 }
 
 /**
@@ -692,7 +713,7 @@ export const filterTaskWithIndex: {
  * @since 1.0.0
  */
 export interface PredicateTask<A> {
-  (a: A): Task<boolean>;
+  (a: A): T.Task<boolean>;
 }
 
 /**
@@ -712,7 +733,7 @@ export const filterTask: {
  * @since 1.0.0
  */
 export const filterMapWithIndex =
-  <A, B>(f: (i: number, a: A) => Option<B>) =>
+  <A, B>(f: (i: number, a: A) => O.Option<B>) =>
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let i = 0;
 
@@ -734,7 +755,7 @@ export const filterMapWithIndex =
  * @category filtering
  * @since 1.0.0
  */
-export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
+export const filterMap = <A, B>(f: (a: A) => O.Option<B>) =>
   filterMapWithIndex<A, B>((_, a) => f(a));
 
 /**
@@ -742,7 +763,7 @@ export const filterMap = <A, B>(f: (a: A) => Option<B>) =>
  * @since 1.0.0
  */
 export const filterMapTaskWithIndex =
-  <A, B>(f: (i: number, a: A) => Task<Option<B>>) =>
+  <A, B>(f: (i: number, a: A) => T.Task<O.Option<B>>) =>
   (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let i = 0;
 
@@ -764,7 +785,7 @@ export const filterMapTaskWithIndex =
  * @category filtering
  * @since 1.0.0
  */
-export const filterMapTask = <A, B>(f: (a: A) => Task<Option<B>>) =>
+export const filterMapTask = <A, B>(f: (a: A) => T.Task<O.Option<B>>) =>
   filterMapTaskWithIndex<A, B>((_, a) => f(a));
 
 /**
@@ -774,7 +795,7 @@ export const filterMapTask = <A, B>(f: (a: A) => Task<Option<B>>) =>
  * @category filtering
  * @since 1.0.0
  */
-export const compact: <A>(fa: AsyncIterable<Option<A>>) => AsyncIterable<A> =
+export const compact: <A>(fa: AsyncIterable<O.Option<A>>) => AsyncIterable<A> =
   /*#__PURE__*/ filterMap(identity);
 
 /**
@@ -846,7 +867,7 @@ export const uniq =
  * @since 1.0.0
  */
 export function transform<A, B>(
-  transform: (a: A) => Option<B>,
+  transform: (a: A) => O.Option<B>,
   flush?: () => B,
 ) {
   return (fa: AsyncIterable<A>): AsyncIterable<B> => {
@@ -877,8 +898,8 @@ export function transform<A, B>(
  * @since 1.0.0
  */
 export function transformTask<A, B>(
-  transform: (a: A) => Task<Option<B>>,
-  flush?: () => Task<B>,
+  transform: (a: A) => T.Task<O.Option<B>>,
+  flush?: () => T.Task<B>,
 ) {
   return (fa: AsyncIterable<A>): AsyncIterable<B> => {
     let isFlushed = false;
@@ -925,8 +946,8 @@ export const tap: {
  * @since 1.0.0
  */
 export const tapTask: {
-  <A, _>(f: (a: A) => Task<_>): (self: AsyncIterable<A>) => AsyncIterable<A>;
-  <A, _>(self: AsyncIterable<A>, f: (a: A) => Task<_>): AsyncIterable<A>;
+  <A, _>(f: (a: A) => T.Task<_>): (self: AsyncIterable<A>) => AsyncIterable<A>;
+  <A, _>(self: AsyncIterable<A>, f: (a: A) => T.Task<_>): AsyncIterable<A>;
 } = /*#__PURE__*/ dual(2, tapTask_(FromTask, Chain));
 
 /**
@@ -1049,7 +1070,7 @@ export function toArraySeq<A>() {
 export const foldMapWithIndexPar =
   <M>(M: Monoid<M>, limit: number) =>
   <A>(f: (i: number, a: A) => M) =>
-  (fa: AsyncIterable<A>): Task<M> =>
+  (fa: AsyncIterable<A>): T.Task<M> =>
     pipe(
       fa,
       reduceUntilWithIndexLimited(limit, constTrue, M.empty, (i, b, a) =>
@@ -1064,7 +1085,10 @@ export const foldMapWithIndexPar =
 export const foldMapPar: <M>(
   M: Monoid<M>,
   limit: number,
-) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => Task<M> = (M, limit) => {
+) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => T.Task<M> = (
+  M,
+  limit,
+) => {
   const foldMapWithIndexM = foldMapWithIndexPar(M, limit);
   return (f) => foldMapWithIndexM((_, a) => f(a));
 };
@@ -1075,7 +1099,7 @@ export const foldMapPar: <M>(
  */
 export const foldMapSeq: <M>(
   M: Monoid<M>,
-) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => Task<M> = (M) => {
+) => <A>(f: (a: A) => M) => (fa: AsyncIterable<A>) => T.Task<M> = (M) => {
   const foldMapWithIndexM = foldMapWithIndexPar(M, 1);
   return (f) => foldMapWithIndexM((_, a) => f(a));
 };

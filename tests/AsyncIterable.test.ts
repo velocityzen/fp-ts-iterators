@@ -4,7 +4,6 @@ import * as N from "fp-ts/number";
 import * as O from "fp-ts/Option";
 import * as S from "fp-ts/string";
 import * as T from "fp-ts/Task";
-// import * as C from "fp-ts/console";
 import { Eq, contramap } from "fp-ts/Eq";
 import { identity, pipe } from "fp-ts/function";
 import { describe, expect, test } from "vitest";
@@ -196,39 +195,69 @@ describe("AsyncIterable", () => {
   test("flatMap", async () => {
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
-      AI.flatMap((i) => AI.fromIterable([i - 1, i + 1])),
+      AI.flatMap((i) => AI.fromIterable([i, i + 1, i + 2, i + 3])),
       AI.toArraySeq(),
     )();
-    expect(values).toStrictEqual([0, 2, 1, 3, 2, 4]);
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6]);
   });
 
   test("flatMap / empty item", async () => {
     const values = await pipe(
-      AI.fromIterable([1, 2, 3]),
+      AI.fromIterable([0, 1, 2, 3, 4]),
       AI.flatMap((i) =>
-        i === 2 ? AI.fromIterable([]) : AI.fromIterable([i - 1, i + 1]),
+        i === 0 || i === 3
+          ? AI.fromIterable([])
+          : AI.fromIterable([i, i + 1, i + 2, i + 3]),
       ),
       AI.toArraySeq(),
     )();
-    expect(values).toStrictEqual([0, 2, 2, 4]);
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
+  });
+
+  test("flatMap / par / empty item", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AI.flatMap((i) =>
+        i === 0 || i === 3
+          ? AI.fromIterable([])
+          : AI.fromIterable([i, i + 1, i + 2, i + 3]),
+      ),
+      AI.toArrayPar(10),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
   });
 
   test("flatMapIterable", async () => {
     const values = await pipe(
-      AI.fromIterable([1, 2, 3]),
-      AI.flatMapIterable((i) => (i === 2 ? [i] : [i, i + 1])),
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AI.flatMapIterable((i) => (i === 2 ? [i] : [i, i + 1, i + 2, i + 3])),
       AI.toArraySeq(),
     )();
-    expect(values).toStrictEqual([1, 2, 2, 3, 4]);
+    expect(values).toStrictEqual([
+      0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 6, 4, 5, 6, 7,
+    ]);
   });
 
   test("flatMapIterable / empty item", async () => {
     const values = await pipe(
-      AI.fromIterable([1, 2, 3]),
-      AI.flatMapIterable((i) => (i === 2 ? [] : [i, i + 1])),
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AI.flatMapIterable((i) =>
+        i === 0 || i === 3 ? [] : [i, i + 1, i + 2, i + 3],
+      ),
       AI.toArraySeq(),
     )();
-    expect(values).toStrictEqual([1, 2, 3, 4]);
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
+  });
+
+  test("flatMapIterable / par / empty item", async () => {
+    const values = await pipe(
+      AI.fromIterable([0, 1, 2, 3, 4]),
+      AI.flatMapIterable((i) =>
+        i === 0 || i === 3 ? [] : [i, i + 1, i + 2, i + 3],
+      ),
+      AI.toArrayPar(10),
+    )();
+    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
   });
 
   test("flatMapTaskWithIndex", async () => {
@@ -236,6 +265,15 @@ describe("AsyncIterable", () => {
       AI.fromIterable([1, 2, 3]),
       AI.flatMapTaskWithIndex((i, a) => T.of(i + a)),
       AI.toArraySeq(),
+    )();
+    expect(values).toStrictEqual([1, 3, 5]);
+  });
+
+  test("flatMapTaskWithIndex / par", async () => {
+    const values = await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.flatMapTaskWithIndex((i, a) => T.of(i + a)),
+      AI.toArrayPar(10),
     )();
     expect(values).toStrictEqual([1, 3, 5]);
   });
