@@ -55,10 +55,7 @@ import { LazyArg, flow, identity, pipe } from "fp-ts/lib/function";
 import { MonadTask2 } from "fp-ts/lib/MonadTask";
 import * as AI from "./AsyncIterable";
 import { AsyncIterableOption } from "./AsyncIterableOption";
-import {
-  getAsyncIteratorNextTask,
-  reduceUntilWithIndexLimited,
-} from "./AsyncIterableReduce";
+import { reduceUntilWithIndexLimited } from "./AsyncIterableReduce";
 import * as I from "./Iterable";
 import {
   asUnit as asUnit_,
@@ -498,7 +495,9 @@ export const flatMap: {
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable = <E, A, B>(f: (a: A) => Iterable<B>) => {
+export const flatMapIterable = <E, A, B>(
+  f: (a: A) => Iterable<B>,
+): ((ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>) => {
   const aief = (a: A): AsyncIterableEither<E, B> => pipe(a, f, fromIterable);
   return flatMap(aief);
 };
