@@ -150,7 +150,6 @@ describe("AsyncIterableOptions", () => {
 
   test("flatMapIterable / empty item / par", () => {
     const start = [O.some([1, 2]), O.none, O.some([]), O.some([4, 5])];
-    const end = [1, 2, 4, 5];
 
     const test = pipe(
       AI.fromIterable(start),
