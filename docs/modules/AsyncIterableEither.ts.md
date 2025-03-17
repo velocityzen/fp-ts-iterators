@@ -1356,10 +1356,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const flatMapIterable: {
-  <A, B>(f: (a: A) => Iterable<B>): <E>(ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
-  <E, A, B>(ma: AsyncIterableEither<E, A>, f: (a: A) => Iterable<B>): AsyncIterableEither<E, B>
-}
+export declare const flatMapIterable: <E, A, B>(
+  f: (a: A) => Iterable<B>
+) => (ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>
 ```
 
 Added in v1.0.0

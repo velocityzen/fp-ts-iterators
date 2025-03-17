@@ -525,10 +525,85 @@ export const flatMap =
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable = <A, B>(f: (a: A) => Iterable<B>) => {
-  const aif = (a: A): AsyncIterable<B> => pipe(a, f, fromIterable);
-  return flatMap(aif);
-};
+export const flatMapIterable =
+  <A, B>(f: (a: A) => Iterable<B>) =>
+  (fa: AsyncIterable<A>): AsyncIterable<B> => {
+    const buffer: B[] = [];
+    const fromBufferQueue: ((b: O.Option<B>) => void)[] = [];
+
+    const nextAIFB = pipe(fa, getAsyncIteratorNextTask, TO.map(f));
+    let isNextAIFBDone = false;
+    let waitingForValues = 0; // fight against race conditions
+
+    async function toBuffer() {
+      if (!isNextAIFBDone) {
+        waitingForValues++;
+        const maybeAIB = await nextAIFB();
+        waitingForValues--;
+
+        if (O.isSome(maybeAIB)) {
+          buffer.push(...maybeAIB.value);
+        } else {
+          isNextAIFBDone = true;
+        }
+      }
+
+      if (!isNextAIFBDone && buffer.length === 0) {
+        await toBuffer();
+      }
+
+      dispatchFromBuffer();
+    }
+
+    function dispatchFromBuffer() {
+      if (buffer.length > 0) {
+        const fromTasks = fromBufferQueue.splice(0, buffer.length);
+        const values = buffer.splice(0, fromTasks.length);
+
+        pipe(
+          fromTasks,
+          A.zip(values),
+          A.map(([task, value]) => {
+            task(O.some(value));
+          }),
+        );
+      }
+
+      if (waitingForValues > 0 || buffer.length > 0) {
+        return;
+      }
+
+      const hopeless = fromBufferQueue.splice(0);
+      hopeless.forEach((task) => {
+        task(O.none);
+      });
+    }
+
+    function addToFromBufferQueue() {
+      return new Promise<O.Option<B>>((resolve) =>
+        fromBufferQueue.push(resolve),
+      );
+    }
+
+    async function next(): Promise<O.Option<B>> {
+      if (buffer.length > 0) {
+        return O.some(buffer.shift() as B);
+      }
+
+      const fromBuffer = addToFromBufferQueue();
+      await toBuffer();
+      return fromBuffer;
+    }
+
+    return {
+      async *[Symbol.asyncIterator]() {
+        const o = await next();
+        if (O.isSome(o)) {
+          yield o.value;
+        }
+      },
+    };
+  };
 
 /**
  * @category sequencing

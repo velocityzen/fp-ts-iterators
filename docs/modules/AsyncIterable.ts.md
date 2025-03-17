@@ -278,7 +278,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function fromAsyncGenerator<A, R, N>(fa: LazyArg<AsyncGenerator<A, R, N>>)
+export declare function fromAsyncGenerator<A>(fa: LazyArg<AsyncGenerator<A>>): AsyncIterable<A>
 ```
 
 Added in v1.0.0
@@ -392,7 +392,7 @@ Added in v1.0.0
 
 ```ts
 export interface PredicateTask<A> {
-  (a: A): Task<boolean>
+  (a: A): T.Task<boolean>
 }
 ```
 
@@ -404,7 +404,7 @@ Added in v1.0.0
 
 ```ts
 export interface PredicateTaskWithIndex<I, A> {
-  (i: I, a: A): Task<boolean>
+  (i: I, a: A): T.Task<boolean>
 }
 ```
 
@@ -836,7 +836,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function transform<A, B>(transform: (a: A) => Option<B>, flush?: () => B)
+export declare function transform<A, B>(transform: (a: A) => O.Option<B>, flush?: () => B)
 ```
 
 Added in v1.0.0
@@ -846,7 +846,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function transformTask<A, B>(transform: (a: A) => Task<Option<B>>, flush?: () => Task<B>)
+export declare function transformTask<A, B>(transform: (a: A) => T.Task<O.Option<B>>, flush?: () => T.Task<B>)
 ```
 
 Added in v1.0.0

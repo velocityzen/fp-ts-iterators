@@ -1,3 +1,5 @@
+import * as A from "fp-ts/Array";
+import * as N from "fp-ts/number";
 import * as E from "fp-ts/Either";
 import * as IO from "fp-ts/IO";
 import * as O from "fp-ts/Option";
@@ -464,23 +466,21 @@ describe("AsyncIterableEither", () => {
   });
 
   test("flatMapIterable / empty item / par", () => {
+    const start = [E.right([1, 2]), E.left("3"), E.right([]), E.right([4, 5])];
+    const end = [1, 2, "3", 4, 5];
+
     const test = pipe(
-      AI.fromIterable([
-        E.right([1, 2]),
-        E.left("3"),
-        E.right([]),
-        E.right([4, 5]),
-      ]),
+      AI.fromIterable(start),
       AIE.flatMapIterable(identity),
       AI.toArrayPar(10),
       T.map((value) => {
-        expect(value).toStrictEqual([
-          E.right(1),
-          E.right(2),
-          E.left("3"),
-          E.right(4),
-          E.right(5),
-        ]);
+        expect(value.length).toBe(end.length);
+
+        expect(A.lefts(value)).toStrictEqual(["3"]);
+
+        const m = A.getDifferenceMagma(N.Eq);
+        const d = m.concat(A.rights(value), [1, 2, 4, 5]);
+        expect(d).toStrictEqual([]);
       }),
     );
 

@@ -7,7 +7,7 @@ import * as AI from "../lib/AsyncIterable";
 import * as AIE from "../lib/AsyncIterableEither";
 import { simpleFaker } from "@faker-js/faker";
 
-describe("Memory leaks", () => {
+describe("Memory leaks and callstacks", () => {
   test("run iterators with thousands of items", () => {
     let length = 0;
 

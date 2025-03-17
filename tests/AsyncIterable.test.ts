@@ -4,6 +4,7 @@ import * as N from "fp-ts/number";
 import * as O from "fp-ts/Option";
 import * as S from "fp-ts/string";
 import * as T from "fp-ts/Task";
+import * as A from "fp-ts/Array";
 import { Eq, contramap } from "fp-ts/Eq";
 import { identity, pipe } from "fp-ts/function";
 import { describe, expect, test } from "vitest";
@@ -315,14 +316,23 @@ describe("AsyncIterable", () => {
   });
 
   test("flatMapIterable / par / empty item", async () => {
+    const start = [0, 1, 2, 3, 4];
+    const more = (i: number) =>
+      i === 0 || i === 3 ? [] : [i, i + 1, i + 2, i + 3];
+
     const values = await pipe(
-      AI.fromIterable([0, 1, 2, 3, 4]),
-      AI.flatMapIterable((i) =>
-        i === 0 || i === 3 ? [] : [i, i + 1, i + 2, i + 3],
-      ),
+      AI.fromIterable(start),
+      AI.flatMapIterable(more),
       AI.toArrayPar(10),
     )();
-    expect(values).toStrictEqual([1, 2, 3, 4, 2, 3, 4, 5, 4, 5, 6, 7]);
+
+    const expected = start.flatMap(more);
+    expect(values.length).toBe(expected.length);
+
+    const m = A.getDifferenceMagma(N.Eq);
+    const d = m.concat(start, expected);
+
+    expect(d).toStrictEqual([0]); // zero because we skip it in more fn
   });
 
   test("flatMapTaskWithIndex", async () => {
@@ -380,7 +390,18 @@ describe("AsyncIterable", () => {
     expect(values).toStrictEqual(["a", "c"]);
   });
 
-  test("filter", async () => {
+  test("filterWithIndex / par", async () => {
+    const f = (n: number) => n % 2 === 0;
+
+    const values = await pipe(
+      AI.fromIterable(["a", "b", "c"]),
+      AI.filterWithIndex(f),
+      AI.toArrayPar(10),
+    )();
+    expect(values).toStrictEqual(["a", "c"]);
+  });
+
+  test("flatMap + filter", async () => {
     const g = (n: number) => n % 2 === 1;
     const values = await pipe(
       AI.fromIterable([1, 2, 3]),
@@ -406,6 +427,16 @@ describe("AsyncIterable", () => {
       AI.fromIterable([O.some(3), O.none, O.some(1)]),
       AI.filter(O.isSome),
       AI.toArraySeq(),
+    )();
+
+    expect(values).toStrictEqual([O.some(3), O.some(1)]);
+  });
+
+  test("filter refinement some / par", async () => {
+    const values = await pipe(
+      AI.fromIterable([O.some(3), O.none, O.some(1)]),
+      AI.filter(O.isSome),
+      AI.toArrayPar(2),
     )();
 
     expect(values).toStrictEqual([O.some(3), O.some(1)]);

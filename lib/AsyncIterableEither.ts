@@ -495,12 +495,15 @@ export const flatMap: {
  * @category sequencing
  * @since 1.0.0
  */
-export const flatMapIterable = <E, A, B>(
-  f: (a: A) => Iterable<B>,
-): ((ma: AsyncIterableEither<E, A>) => AsyncIterableEither<E, B>) => {
-  const aief = (a: A): AsyncIterableEither<E, B> => pipe(a, f, fromIterable);
-  return flatMap(aief);
-};
+export const flatMapIterable =
+  <E, A, B>(f: (a: A) => Iterable<B>) =>
+  (ma: AsyncIterableEither<E, A>): AsyncIterableEither<E, B> =>
+    pipe(
+      ma,
+      AI.flatMapIterable((e) =>
+        E.isLeft(e) ? I.of(e) : pipe(e.right, f, I.map(E.right<E, B>)),
+      ),
+    );
 
 /**
  * @category sequencing

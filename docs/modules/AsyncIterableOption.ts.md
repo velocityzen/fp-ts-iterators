@@ -109,6 +109,7 @@ Added in v1.0.0
 - [sequencing](#sequencing)
   - [flatMap](#flatmap)
   - [flatMapEither](#flatmapeither)
+  - [flatMapIterable](#flatmapiterable)
   - [flatMapOption](#flatmapoption)
   - [flatMapTask](#flatmaptask)
   - [flatMapTaskEither](#flatmaptaskeither)
@@ -1001,6 +1002,18 @@ Added in v1.0.0
 export declare const flatMapEither: <E, A, B>(
   f: (a: A) => Either<E, B>
 ) => (fa: AsyncIterableOption<A>) => AsyncIterableOption<B>
+```
+
+Added in v1.0.0
+
+## flatMapIterable
+
+**Signature**
+
+```ts
+export declare const flatMapIterable: <A, B>(
+  f: (a: A) => Iterable<B>
+) => (ma: AsyncIterableOption<A>) => AsyncIterableOption<B>
 ```
 
 Added in v1.0.0

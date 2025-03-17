@@ -1,16 +1,18 @@
+import * as A from "fp-ts/Array";
+import * as N from "fp-ts/Number";
 import * as O from "fp-ts/Option";
 import * as E from "fp-ts/Either";
 import * as T from "fp-ts/Task";
 import * as TO from "fp-ts/TaskOption";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
+import { identity, pipe } from "fp-ts/function";
 import * as AI from "../lib/AsyncIterable";
 import * as AIO from "../lib/AsyncIterableOption";
 import * as AIE from "../lib/AsyncIterableEither";
 import { createTestAsyncIterable } from "./helpers";
 import { describe, expect, test } from "vitest";
 
-describe("AsyncIterableEither", () => {
+describe("AsyncIterableOptions", () => {
   test("tryCatch with no error", () => {
     const test = pipe(
       createTestAsyncIterable(),
@@ -18,7 +20,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-      })
+      }),
     );
 
     return test();
@@ -39,7 +41,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([0, 1, 2]);
-      })
+      }),
     )();
 
     await pipe(
@@ -54,7 +56,7 @@ describe("AsyncIterableEither", () => {
           O.none,
           O.some(4),
         ]);
-      })
+      }),
     )();
   });
 
@@ -65,7 +67,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([2, 4]);
-      })
+      }),
     );
 
     return test();
@@ -78,7 +80,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([4]);
-      })
+      }),
     )();
 
     await pipe(
@@ -87,7 +89,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
   });
 
@@ -98,7 +100,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some("a")]);
-      })
+      }),
     );
 
     return test();
@@ -111,7 +113,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some("b")]);
-      })
+      }),
     );
 
     return test();
@@ -124,7 +126,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(2), O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -133,7 +135,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none, O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -142,8 +144,30 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none, O.none, O.some(2)]);
-      })
+      }),
     )();
+  });
+
+  test("flatMapIterable / empty item / par", () => {
+    const start = [O.some([1, 2]), O.none, O.some([]), O.some([4, 5])];
+    const end = [1, 2, 4, 5];
+
+    const test = pipe(
+      AI.fromIterable(start),
+      AIO.flatMapIterable(identity),
+      AI.toArrayPar(10),
+      T.map((value) => {
+        expect(value.length).toBe(5);
+
+        expect(value.filter(O.isNone).length).toStrictEqual(1);
+
+        const m = A.getDifferenceMagma(N.Eq);
+        const d = m.concat(A.compact(value), [1, 2, 4, 5]);
+        expect(d).toStrictEqual([]);
+      }),
+    );
+
+    return test();
   });
 
   test("flatMapTask", () => {
@@ -153,7 +177,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(2), O.none, O.some(6)]);
-      })
+      }),
     );
 
     return test();
@@ -166,7 +190,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([2, 4]);
-      })
+      }),
     );
 
     return test();
@@ -179,7 +203,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([2, 4]);
-      })
+      }),
     );
 
     return test();
@@ -191,7 +215,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -199,7 +223,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
   });
 
@@ -215,7 +239,7 @@ describe("AsyncIterableEither", () => {
           O.some(3),
           O.some(4),
         ]);
-      })
+      }),
     );
 
     return test();
@@ -234,7 +258,7 @@ describe("AsyncIterableEither", () => {
           O.some(3),
           O.some(4),
         ]);
-      })
+      }),
     );
 
     return test();
@@ -254,7 +278,7 @@ describe("AsyncIterableEither", () => {
           O.some(3),
           O.some(4),
         ]);
-      })
+      }),
     );
 
     return test();
@@ -269,7 +293,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -278,7 +302,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(3)]);
-      })
+      }),
     )();
   });
 
@@ -288,7 +312,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -296,7 +320,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(3)]);
-      })
+      }),
     )();
   });
 
@@ -306,7 +330,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -314,7 +338,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(3)]);
-      })
+      }),
     )();
   });
 
@@ -324,7 +348,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([1]);
-      })
+      }),
     );
 
     return test();
@@ -336,7 +360,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([1]);
-      })
+      }),
     );
 
     return test();
@@ -348,7 +372,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -356,7 +380,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(1)]);
-      })
+      }),
     )();
   });
 
@@ -366,7 +390,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -374,7 +398,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((values) => {
         expect(values).toStrictEqual([O.some(3)]);
-      })
+      }),
     )();
   });
 
@@ -383,12 +407,12 @@ describe("AsyncIterableEither", () => {
       AI.fromIterable([O.some(1), O.none, O.some(3)]),
       AIO.match(
         () => "none",
-        (i) => `some${i}`
+        (i) => `some${i}`,
       ),
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual(["some1", "none", "some3"]);
-      })
+      }),
     );
 
     return test();
@@ -399,12 +423,12 @@ describe("AsyncIterableEither", () => {
       AI.fromIterable([O.some(1), O.none, O.some(3)]),
       AIO.matchE(
         () => T.of("none"),
-        (i) => T.of(`some${i}`)
+        (i) => T.of(`some${i}`),
       ),
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual(["some1", "none", "some3"]);
-      })
+      }),
     );
 
     return test();
@@ -417,7 +441,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([1, 100, 3]);
-      })
+      }),
     );
 
     return test();
@@ -430,7 +454,7 @@ describe("AsyncIterableEither", () => {
       AIO.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([1]);
-      })
+      }),
     )();
 
     await pipe(
@@ -439,7 +463,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     await pipe(
@@ -448,7 +472,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none]);
-      })
+      }),
     )();
   });
 
@@ -459,7 +483,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some("b")]);
-      })
+      }),
     );
 
     return test();
@@ -472,7 +496,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some(undefined)]);
-      })
+      }),
     );
 
     return test();
@@ -485,7 +509,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none, O.none, O.some(3)]);
-      })
+      }),
     );
 
     return test();
@@ -494,11 +518,11 @@ describe("AsyncIterableEither", () => {
   test("tapIO", () => {
     const test = pipe(
       AI.fromIterable([O.some("foo"), O.none, O.some("bar")]),
-      AIO.tapIO((a) => () => a.length > 2 ? AIO.some(a.length) : AIO.none()),
+      AIO.tapIO((a) => () => (a.length > 2 ? AIO.some(a.length) : AIO.none())),
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some("foo"), O.none, O.some("bar")]);
-      })
+      }),
     );
 
     return test();
@@ -514,7 +538,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some(1)]);
-      })
+      }),
     )();
 
     await pipe(
@@ -523,7 +547,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none]);
-      })
+      }),
     )();
 
     expect(ref).toStrictEqual([1]);
@@ -540,7 +564,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none, O.none, O.some(3)]);
-      })
+      }),
     )();
 
     expect(ref).toStrictEqual([3]);
@@ -557,7 +581,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.none, O.none, O.some(3)]);
-      })
+      }),
     )();
 
     expect(ref).toStrictEqual([3]);
@@ -570,7 +594,7 @@ describe("AsyncIterableEither", () => {
       AI.toArraySeq(),
       T.map((value) => {
         expect(value).toStrictEqual([O.some(1), O.none, O.some(3)]);
-      })
+      }),
     );
 
     return test();
@@ -581,7 +605,7 @@ describe("AsyncIterableEither", () => {
     const values = await pipe(
       AIO.fromIterable([1, 2, 3]),
       AIO.filter(g),
-      AI.toArraySeq()
+      AI.toArraySeq(),
     )();
 
     expect(values).toStrictEqual([O.some(1), O.none, O.some(3)]);
