@@ -1,11 +1,11 @@
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
-import * as N from "fp-ts/Number";
+import { identity, pipe } from "fp-ts/function";
+import * as N from "fp-ts/number";
 import * as O from "fp-ts/Option";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import * as TO from "fp-ts/TaskOption";
-import { identity, pipe } from "fp-ts/function";
 import { describe, expect, test } from "vitest";
 import * as AI from "../lib/AsyncIterable";
 import * as AIE from "../lib/AsyncIterableEither";
