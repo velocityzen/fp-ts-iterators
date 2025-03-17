@@ -632,12 +632,36 @@ describe("AsyncIterable", () => {
 
   test("tapTask", async () => {
     const ref: Array<number> = [];
-    const add = (value: number) => T.fromIO(() => ref.push(value));
+    const add = (value: number) =>
+      pipe(
+        T.fromIO(() => ref.push(value)),
+        T.flatMap(() => T.of("great")),
+      );
 
     await pipe(
       AI.fromIterable([1, 2, 3]),
       AI.tapTask(add),
       AI.toArraySeq(),
+      T.map((value) => {
+        expect(value).toStrictEqual([1, 2, 3]);
+      }),
+    )();
+
+    expect(ref).toStrictEqual([1, 2, 3]);
+  });
+
+  test("tapTask / par", async () => {
+    const ref: Array<number> = [];
+    const add = (value: number) =>
+      pipe(
+        T.fromIO(() => ref.push(value)),
+        T.flatMap(() => T.of("great")),
+      );
+
+    await pipe(
+      AI.fromIterable([1, 2, 3]),
+      AI.tapTask(add),
+      AI.toArrayPar(10),
       T.map((value) => {
         expect(value).toStrictEqual([1, 2, 3]);
       }),

@@ -856,7 +856,10 @@ describe("AsyncIterableEither", () => {
   test("tapTaskEither", async () => {
     const ref: Array<number> = [];
     const add = (value: number) =>
-      T.fromIO(() => (value < 2 ? E.left("left") : E.right(ref.push(value))));
+      pipe(
+        T.fromIO(() => (value < 2 ? E.left("left") : E.right(ref.push(value)))),
+        TE.flatMap(() => TE.of("great")),
+      );
 
     await pipe(
       AI.fromIterable([E.right(1), E.left("left"), E.right(3)]),
